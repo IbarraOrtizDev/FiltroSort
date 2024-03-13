@@ -64,7 +64,15 @@ var filter = "propertyName==value,propertyAge>=20,city@=Medellín|Bogota"
 //.Where(x => x.propertyName == "value" && x.propertyAge >= 20 && cities.Contains(x.city))
 ```
 
-## Nota: Tener en cuenta que el operador que no sea valido sera ignorado y esto es aplicado a nivel de operador y de operación.
+## Consulta por grupo de filtros de una propiedad
+
+Cuando se requiere filtrar por un grupo de filtros de una propiedad, se puede hacer uso de la siguiente sintaxis:
+
+``` C#
+var filter = "propertyName==value1|value2|value3"
+//Example response
+//.Where(x => new List<string> { "value1", "value2", "value3" }.Contains(x.propertyName))
+```
 
 El resultado del filtro es una expresión lambda que se puede aplicar a una lista de objetos.
 

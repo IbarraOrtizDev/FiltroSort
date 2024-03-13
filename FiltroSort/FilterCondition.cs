@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using System.Reflection.Metadata;
+using FilterSort.Helpers;
 
 namespace FilterSort
 {
@@ -8,23 +8,14 @@ namespace FilterSort
         public static BinaryExpression BinaryExpression(string propertyName, string operatorFilter, ParameterExpression parameter, string value, List<string> values, Type typeValue)
         {
             var property = Expression.Property(parameter, propertyName);
-            Expression constant;
+            
+            if(values != null && values.Count > 0)
+            {
+                operatorFilter = operatorFilter == "!@=" ? "NOT IN" : "IN";
+            }
+            Expression constant = GenerateExpressionConstant.GetExpressionConstant(propertyName, operatorFilter, parameter, value, values, typeValue);
 
-            try
-            {
-                if (typeValue == typeof(string))
-                {
-                    constant = Expression.Constant(value);
-                }
-                else
-                {
-                    constant = Expression.Constant(Convert.ChangeType(value, typeValue));
-                }
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            if (constant == null) return null;
 
             return operatorFilter switch
             {
@@ -47,6 +38,8 @@ namespace FilterSort
                 "!=*" => resolveNotEqualCaseInsensitive(property, constant),
                 "!@=*" => resolveNotContainsCaseInsensitive(property, constant),
                 "!_=*" => resolveNotStartWithCaseInsensitive(property, constant),
+                "IN" => resolveInOrNotIn(property, values, typeValue, true),
+                "NOT IN" => resolveInOrNotIn(property, values, typeValue, false),
                 _ => throw new ArgumentException("Invalid operator filter")
             };
         }
@@ -123,5 +116,53 @@ namespace FilterSort
             return Expression.Equal(notStartWith, Expression.Constant(true));
         }
 
+        private static BinaryExpression resolveInOrNotIn(Expression property, List<string> values, Type typeValue, bool isIn)
+        {
+            MethodCallExpression call = resolveContainsMethod(property, values, typeValue);
+            
+            if (isIn)
+                return Expression.Equal(call, Expression.Constant(true));
+            var notStartWith = Expression.Not(call);
+            return Expression.NotEqual(notStartWith, Expression.Constant(true));
+        }
+
+        private static MethodCallExpression resolveContainsMethod(Expression property, List<string> values, Type typeValue)
+        {
+            MethodCallExpression call;
+            switch (typeValue)
+            {
+                case Type t when t == typeof(int):
+                    call = GenerateDinamicMethodCallExpression<int>.methodCall(property, values);
+                    break;
+                case Type t when t == typeof(decimal):
+                    call = GenerateDinamicMethodCallExpression<decimal>.methodCall(property, values);
+                    break;
+                case Type t when t == typeof(double):
+                    call = GenerateDinamicMethodCallExpression<double>.methodCall(property, values);
+                    break;
+                case Type t when t == typeof(float):
+                    call = GenerateDinamicMethodCallExpression<float>.methodCall(property, values);
+                    break;
+                case Type t when t == typeof(long):
+                    call = GenerateDinamicMethodCallExpression<long>.methodCall(property, values);
+                    break;
+                case Type t when t == typeof(short):
+                    call = GenerateDinamicMethodCallExpression<short>.methodCall(property, values);
+                    break;
+                case Type t when t == typeof(byte):
+                    call = GenerateDinamicMethodCallExpression<byte>.methodCall(property, values);
+                    break;
+                case Type t when t == typeof(bool):
+                    call = GenerateDinamicMethodCallExpression<bool>.methodCall(property, values);
+                    break;
+                case Type t when t == typeof(DateTime):
+                    call = GenerateDinamicMethodCallExpression<DateTime>.methodCall(property, values);
+                    break;
+                default:
+                    call = GenerateDinamicMethodCallExpression<string>.methodCall(property, values);
+                    break;
+            }
+            return call;
+        }
     }
 }

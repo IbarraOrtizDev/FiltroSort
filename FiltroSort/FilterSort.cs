@@ -75,7 +75,7 @@ namespace FiltroSort
             var valor = filterParamUnique.Split(operatorFilter)[1];
             if(!(valor == null || valor == string.Empty))
             {
-                if (deserializeFilterProperty.Operator.Contains("|"))
+                if (valor.Contains("|"))
                 {
                     deserializeFilterProperty.Values = valor.Split('|').ToList();
                 }
