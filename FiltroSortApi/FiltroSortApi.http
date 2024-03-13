@@ -1,0 +1,6 @@
+@FiltroSortApi_HostAddress = http://localhost:5267
+
+GET {{FiltroSortApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
