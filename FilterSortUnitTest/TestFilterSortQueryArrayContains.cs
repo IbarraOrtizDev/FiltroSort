@@ -38,14 +38,14 @@
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadFecha==2022-01-01|2022-01-02";
+            filter.Filter = "propiedadFecha==2022-01-01|2022-01-02,propiedadBooleana==true";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
 
             var filters = new List<DateTime> { DateTime.Parse("2022-01-01"), DateTime.Parse("2022-01-02") };
-            var dataCount = _data.Where(x => filters.Contains(x.propiedadFecha)).ToList();
+            var dataCount = _data.Where(x => filters.Contains(x.propiedadFecha) && x.propiedadBooleana==true).ToList();
             //assert
             Assert.AreEqual(dataCount.Count, data.Count);
         }
