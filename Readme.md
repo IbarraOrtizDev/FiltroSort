@@ -1,6 +1,6 @@
 ﻿# FiltroSort
 
-FilterSoft busca ser una herramienta que permita a los usuarios filtrar y visualizar información de manera sencilla y rápida. La idea es que el usuario pueda cargar un archivo de datos, seleccionar las columnas que le interesan y aplicar filtros a los datos, ordenarlos y paginarlos.
+FiltroSort busca ser una herramienta que permita a los usuarios filtrar y visualizar información de manera sencilla y rápida. La idea es que el usuario pueda cargar un archivo de datos, seleccionar las columnas que le interesan y aplicar filtros a los datos, ordenarlos y paginarlos.
 
 Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructura:
 
