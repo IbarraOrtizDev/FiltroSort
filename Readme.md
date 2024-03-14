@@ -63,6 +63,13 @@ var filter = "propertyName==value,propertyAge>=20,city@=Medellín|Bogota"
 //.Where(x => x.propertyName == "value" && x.propertyAge >= 20 && cities.Contains(x.city))
 ```
 
+## Si quiero filtrar por todas las categorias Searchable
+
+``` C#
+var filter = "valor"
+//Con esto ya se encarga de buscar ese valor con el metodo .Contains en todas las propiedades searchable
+```
+
 ## Consulta por grupo de filtros de una propiedad
 
 Cuando se requiere filtrar por un grupo de filtros de una propiedad, se puede hacer uso de la siguiente sintaxis:
