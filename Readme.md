@@ -53,6 +53,7 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 | `decimal`  | `==`, `!=`, `>`, `<`, `>=`, `<=` |
 | `DateTime` | `==`, `!=`, `>`, `<`, `>=`, `<=` |
 | `bool`     | `==`, `!=` |
+| `Array`    | `@=`, `!@=` Si se quiere evaluar una lista de datos cuando se separa por "|" aplican estos dos operadores |
 
 ## Ejemplo de filtro
 
@@ -75,7 +76,7 @@ var filter = "valor"
 Cuando se requiere filtrar por un grupo de filtros de una propiedad, se puede hacer uso de la siguiente sintaxis:
 
 ``` C#
-var filter = "propertyName==value1|value2|value3"
+var filter = "propertyName@=value1|value2|value3"
 //Example response
 //.Where(x => new List<string> { "value1", "value2", "value3" }.Contains(x.propertyName))
 ```
