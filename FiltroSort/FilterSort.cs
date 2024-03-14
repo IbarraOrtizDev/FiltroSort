@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection;
 using FilterSort;
 using FilterSort.Models;
 
@@ -26,8 +27,9 @@ namespace FiltroSort
             if (string.IsNullOrWhiteSpace(filterParam)) return null;
 
             //List properties of T
-            var properties = typeof(T).GetProperties();
-            var propertiesList = properties.Select(x => x.Name).ToList();
+            //var properties = typeof(T).GetProperties();
+            //var propertiesList = properties.Select(x => x.Name).ToList();
+            var propertiesList = GetSearchableProperties<T>();
 
             var listFilters = filterParam.Split(',').ToList();
             BinaryExpression binaryExpressions = null;
@@ -147,6 +149,12 @@ namespace FiltroSort
                 };
             }
             return false;
-        }   
+        }
+
+        public static List<string> GetSearchableProperties<T>()
+        {
+            return typeof(T).GetProperties()
+                .Where(e => e.GetCustomAttribute<Searchable>(true) != null).Select(x => x.Name).ToList();
+        }
     }
 }
