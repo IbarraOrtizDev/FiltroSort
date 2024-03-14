@@ -27,7 +27,7 @@ namespace FiltroSort
         public Expression<Func<T, bool>> GetFilterExpression()
         {
             var parameter = Expression.Parameter(typeof(T), "x");
-            var expression = GetFilterExpression(parameter, _modelFiltrol.Filter);
+            var expression = GetFilterExpressionGenerator(parameter, _modelFiltrol.Filter);
             if(expression == null) return x => true;
             //Pagination
             return Expression.Lambda<Func<T, bool>>(expression, parameter);
@@ -41,7 +41,7 @@ namespace FiltroSort
         /// <returns>
         /// Retorna una expresion binaria, de acuerdo a los segmentos de la cadena de filtro
         /// </returns>
-        private BinaryExpression GetFilterExpression(ParameterExpression parameter, string filterParam)
+        private BinaryExpression GetFilterExpressionGenerator(ParameterExpression parameter, string filterParam)
         {
             if (string.IsNullOrWhiteSpace(filterParam)) return null;
 
