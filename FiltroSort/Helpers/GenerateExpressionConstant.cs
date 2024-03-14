@@ -2,8 +2,21 @@
 
 namespace FilterSort.Helpers
 {
+    /// <summary>
+    /// Generate Expression Constant, esta clase se encarga de generar la expresion constante
+    /// </summary>
     public class GenerateExpressionConstant
     {
+        /// <summary>
+        /// Get Expression Constant, este metodo se encarga de obtener la expresion constante
+        /// </summary>
+        /// <param name="operatorFilter"></param>
+        /// <param name="value"></param>
+        /// <param name="values"></param>
+        /// <param name="typeValue"></param>
+        /// <returns>
+        /// Expression
+        /// </returns>
         public static Expression GetExpressionConstant(string operatorFilter, string value, List<string> values, Type typeValue)
         {
             Expression constant = null;

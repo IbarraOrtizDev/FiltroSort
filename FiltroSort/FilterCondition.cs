@@ -3,8 +3,24 @@ using FilterSort.Helpers;
 
 namespace FilterSort
 {
+    /// <summary>
+    /// Class FilterCondition, esta clase se encarga de generar la expresion de condicion
+    /// </summary>
     public class FilterCondition
     {
+        /// <summary>
+        /// BinaryExpression, este metodo se encarga de generar la expresion binaria, la cual se utiliza para generar la expresion de condicion, cuando el parametro de busqueda values no es vacio, se utiliza el operador IN o NOT IN
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="operatorFilter"></param>
+        /// <param name="parameter"></param>
+        /// <param name="value"></param>
+        /// <param name="values"></param>
+        /// <param name="typeValue"></param>
+        /// <returns>
+        /// Retorna la expresion binaria
+        /// </returns>
+        /// <exception cref="ArgumentException"></exception>
         public static BinaryExpression BinaryExpression(string propertyName, string operatorFilter, ParameterExpression parameter, string value, List<string> values, Type typeValue)
         {
             var property = Expression.Property(parameter, propertyName);
@@ -43,6 +59,16 @@ namespace FilterSort
                 _ => throw new ArgumentException("Invalid operator filter")
             };
         }
+
+        /// <summary>
+        /// BinaryExpression, este metodo se encarga de generar la expresion binaria, es utilizado cuando el filtro es unico y no se establecio propiedad, en este caso se busca en todas las propiedades [Searchable] del modelo
+        /// </summary>
+        /// <param name="listProperties"></param>
+        /// <param name="parameter"></param>
+        /// <param name="value"></param>
+        /// <returns>
+        /// Retorna la expresion binaria
+        /// </returns>
         public static BinaryExpression BinaryExpression(List<string> listProperties, ParameterExpression parameter, string value)
         {
             BinaryExpression binaryExpressionsReturn = null;
@@ -61,77 +87,202 @@ namespace FilterSort
             }
             return binaryExpressionsReturn;
         }
+
+        /// <summary>
+        /// resolveContains, este metodo se encarga de generar la expresion binaria para el operador Contains
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="typeValue"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Contains
+        /// </returns>
         private static BinaryExpression resolveContains(Expression property, Type typeValue, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "Contains", null, constant);
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveNotContains, este metodo se encarga de generar la expresion binaria para el operador Not Contains
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Not Contains
+        /// </returns>
         private static BinaryExpression resolveNotContains(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "Contains", null, constant);
             var notContains = Expression.Not(callExpression);
             return Expression.Equal(notContains, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveStartWith, este metodo se encarga de generar la expresion binaria para el operador Start With
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Start With
+        /// </returns>
         private static BinaryExpression resolveStartWith(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "StartsWith", null, constant);
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveNotStartWith, este metodo se encarga de generar la expresion binaria para el operador Not Start With
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Not Start With
+        /// </returns>
         private static BinaryExpression resolveNotStartWith(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "StartsWith", null, constant);
             var notStartWith = Expression.Not(callExpression);
             return Expression.Equal(notStartWith, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveEndWith, este metodo se encarga de generar la expresion binaria para el operador End With
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de End With
+        /// </returns>
         private static BinaryExpression resolveEndWith(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "EndsWith", null, constant);
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveNotEndWith, este metodo se encarga de generar la expresion binaria para el operador Not End With
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Not End With
+        /// </returns>
         private static BinaryExpression resolveNotEndWith(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "EndsWith", null, constant);
             var notEndWith = Expression.Not(callExpression);
             return Expression.Equal(notEndWith, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveContainsCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Contains ignorando mayusculas y minusculas
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Contains ignorando mayusculas y minusculas
+        /// </returns>
         private static BinaryExpression resolveContainsCaseInsensitive(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveStartWithCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Start With ignorando mayusculas y minusculas
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Start With ignorando mayusculas y minusculas
+        /// </returns>
         private static BinaryExpression resolveStartWithCaseInsensitive(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "StartsWith", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveEndWithCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador End With ignorando mayusculas y minusculas
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de End With ignorando mayusculas y minusculas
+        /// </returns>
         private static BinaryExpression resolveEndWithCaseInsensitive(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "EndsWith", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveEqualsCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Equals ignorando mayusculas y minusculas
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Equals ignorando mayusculas y minusculas
+        /// </returns>
         private static BinaryExpression resolveEqualsCaseInsensitive(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "Equals", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveNotEqualCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Not Equal ignorando mayusculas y minusculas
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Not Equal ignorando mayusculas y minusculas
+        /// </returns>
         private static BinaryExpression resolveNotEqualCaseInsensitive(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "Equals", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             var notEquals = Expression.Not(callExpression);
             return Expression.Equal(notEquals, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveNotContainsCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Not Contains ignorando mayusculas y minusculas
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns>
+        /// Retorna la expresion binaria de Not Contains ignorando mayusculas y minusculas
+        /// </returns>
         private static BinaryExpression resolveNotContainsCaseInsensitive(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             var notContains = Expression.Not(callExpression);
             return Expression.Equal(notContains, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveNotStartWithCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Not Start With ignorando mayusculas y minusculas
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="constant"></param>
+        /// <returns></returns>
         private static BinaryExpression resolveNotStartWithCaseInsensitive(Expression property, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "StartsWith", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             var notStartWith = Expression.Not(callExpression);
             return Expression.Equal(notStartWith, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveInOrNotIn, este metodo se encarga de generar la expresion binaria donde evalua si el valor esta en la lista de valores, de acuerdo al parametro isIn, valida si el valor esta en la lista de valores o no
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="values"></param>
+        /// <param name="typeValue"></param>
+        /// <param name="isIn"></param>
+        /// <returns></returns>
         private static BinaryExpression resolveInOrNotIn(Expression property, List<string> values, Type typeValue, bool isIn)
         {
             MethodCallExpression call = resolveContainsMethod(property, values, typeValue);
@@ -141,6 +292,14 @@ namespace FilterSort
             var notStartWith = Expression.Not(call);
             return Expression.NotEqual(notStartWith, Expression.Constant(true));
         }
+        
+        /// <summary>
+        /// resolveContainsMethod, este metodo se encarga de generar la expresion de llamada a metodo Contains, de acuerdo al tipo de valor
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="values"></param>
+        /// <param name="typeValue"></param>
+        /// <returns></returns>
         private static MethodCallExpression resolveContainsMethod(Expression property, List<string> values, Type typeValue)
         {
             MethodCallExpression call;

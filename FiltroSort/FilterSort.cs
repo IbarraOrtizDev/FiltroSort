@@ -5,6 +5,10 @@ using FilterSort.Models;
 
 namespace FiltroSort
 {
+    /// <summary>
+    /// Clase que se encarga de generar la expresion lambda para filtrar
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class FilterSort<T>
     {
         FilterSoftModel _modelFiltrol;
@@ -14,6 +18,12 @@ namespace FiltroSort
             _modelFiltrol = modelFiltrol;
         }
 
+        /// <summary>
+        /// Crea la lambda expression para filtrar los datos, de acuerdo a la cadena de filtro
+        /// </summary>
+        /// <returns>
+        /// Expresion lambda a evaluar
+        /// </returns>
         public Expression<Func<T, bool>> GetFilterExpression()
         {
             var parameter = Expression.Parameter(typeof(T), "x");
@@ -22,6 +32,15 @@ namespace FiltroSort
             //Pagination
             return Expression.Lambda<Func<T, bool>>(expression, parameter);
         }
+
+        /// <summary>
+        /// Deserializa cada segmento de la cadena de filtro y para cada segmento genera la expresion binaria
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="filterParam"></param>
+        /// <returns>
+        /// Retorna una expresion binaria, de acuerdo a los segmentos de la cadena de filtro
+        /// </returns>
         private BinaryExpression GetFilterExpression(ParameterExpression parameter, string filterParam)
         {
             if (string.IsNullOrWhiteSpace(filterParam)) return null;
@@ -59,6 +78,13 @@ namespace FiltroSort
             return binaryExpressions;
         }
 
+        /// <summary>
+        /// Deserializa cada segmento de la cadena de filtro
+        /// </summary>
+        /// <param name="filterParamUnique"></param>
+        /// <returns>
+        /// Retorna un objeto de tipo DeserializeFilterProperty, donde esta la propiedad, el valor y el operador
+        /// </returns>
         private DeserializeFilterProperty GetConditionExpression(string filterParamUnique)
         {
             var listOperators = new List<string> { "!_=*", "!@=*", "_-=*", "!_-=", "_-=", "!@=", "!_=", "@=*", "_=*", "==*", "!=*", "==", "!=", ">=", "<=", "@=", "_=", ">", "<" };
@@ -94,6 +120,14 @@ namespace FiltroSort
             }
             return deserializeFilterProperty;
         }
+        /// <summary>
+        /// Operator is valid for type, evaluamos si el operador es valido para el tipo de dato que se esta evaluando
+        /// </summary>
+        /// <param name="operatorFilter"></param>
+        /// <param name="type"></param>
+        /// <returns>
+        /// Retorna un valor booleano
+        /// </returns>
         private bool OperatorIsValidForType(string operatorFilter, Type type)
         {
             if (type == typeof(string))
@@ -156,6 +190,13 @@ namespace FiltroSort
             return false;
         }
 
+        /// <summary>
+        /// Lista las propiedades que son buscables
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>
+        /// Lista de propiedades que son buscables
+        /// </returns>
         public static List<string> GetSearchableProperties<T>()
         {
             return typeof(T).GetProperties()
