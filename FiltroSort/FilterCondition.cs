@@ -13,7 +13,7 @@ namespace FilterSort
             {
                 operatorFilter = operatorFilter == "!@=" ? "NOT IN" : "IN";
             }
-            Expression constant = GenerateExpressionConstant.GetExpressionConstant(propertyName, operatorFilter, parameter, value, values, typeValue);
+            Expression constant = GenerateExpressionConstant.GetExpressionConstant(operatorFilter, value, values, typeValue);
 
             if (constant == null) return null;
 
@@ -42,6 +42,23 @@ namespace FilterSort
                 "NOT IN" => resolveInOrNotIn(property, values, typeValue, false),
                 _ => throw new ArgumentException("Invalid operator filter")
             };
+        }
+
+        public static BinaryExpression BinaryExpression(List<string> listProperties, ParameterExpression parameter, string value)
+        {
+            BinaryExpression binaryExpressionsReturn = null;
+            Expression constant = GenerateExpressionConstant.GetExpressionConstant("@=", value, null, typeof(string));
+            foreach (var property in listProperties)
+            {
+                var propertyExp = Expression.Property(parameter, property);
+                MethodCallExpression callExpression = Expression.Call(propertyExp, "Contains", null, constant);
+                var expValidate = Expression.Equal(callExpression, Expression.Constant(true));
+                if(binaryExpressionsReturn == null)
+                    binaryExpressionsReturn = expValidate;
+                else
+                    binaryExpressionsReturn = Expression.OrElse(binaryExpressionsReturn, expValidate);
+            }
+            return binaryExpressionsReturn;
         }
 
         private static BinaryExpression resolveContains(Expression property, Type typeValue, Expression constant)

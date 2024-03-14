@@ -4,7 +4,7 @@ namespace FilterSort.Helpers
 {
     public class GenerateExpressionConstant
     {
-        public static Expression GetExpressionConstant(string propertyName, string operatorFilter, ParameterExpression parameter, string value, List<string> values, Type typeValue)
+        public static Expression GetExpressionConstant(string operatorFilter, string value, List<string> values, Type typeValue)
         {
             Expression constant = null;
             if (operatorFilter == "IN" || operatorFilter == "NOT IN")

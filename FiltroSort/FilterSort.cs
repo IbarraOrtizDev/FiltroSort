@@ -26,9 +26,6 @@ namespace FiltroSort
         {
             if (string.IsNullOrWhiteSpace(filterParam)) return null;
 
-            //List properties of T
-            //var properties = typeof(T).GetProperties();
-            //var propertiesList = properties.Select(x => x.Name).ToList();
             var propertiesList = GetSearchableProperties<T>();
 
             var listFilters = filterParam.Split(',').ToList();
@@ -37,19 +34,25 @@ namespace FiltroSort
             foreach (var filter in listFilters)
             {
                 var conditionData = GetConditionExpression(filter);
-                if(conditionData == null || (conditionData.Value == null && conditionData.Values == null)) continue;
-                if (conditionData == null || !propertiesList.Contains(conditionData.PropertyName)) continue;
-                var property = typeof(T).GetProperty(conditionData.PropertyName);
-                var condition = FilterCondition.BinaryExpression(conditionData.PropertyName, conditionData.Operator, parameter,  conditionData.Value, conditionData.Values, property.PropertyType);
-                if(condition == null) continue;
-                if (binaryExpressions == null)
+                BinaryExpression condition=null;
+                if (conditionData == null && listFilters.Count == 1)
                 {
-                    binaryExpressions = condition;
+                    condition = FilterCondition.BinaryExpression(propertiesList, parameter, filterParam);
                 }
                 else
                 {
+                    if (conditionData == null || conditionData.PropertyName == null || !OperatorIsValidForType(conditionData.Operator, typeof(T).GetProperty(conditionData.PropertyName).PropertyType)) continue;
+                    var property = typeof(T).GetProperty(conditionData.PropertyName);
+                    condition = FilterCondition.BinaryExpression(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Value, conditionData.Values, property.PropertyType);
+                    if (condition == null) continue;
+                };
+                if((conditionData.Value == null && conditionData.Values == null) 
+                    || !propertiesList.Contains(conditionData.PropertyName)) continue;
+                
+                if (binaryExpressions == null)
+                    binaryExpressions = condition;
+                else
                     binaryExpressions = Expression.AndAlso(binaryExpressions, condition);
-                }
             }
 
             return binaryExpressions;
@@ -69,11 +72,12 @@ namespace FiltroSort
                     break;
                 }
             }
-            if(operatorFilter == string.Empty) return null;
-            if(typeof(T).GetProperty(filterParamUnique.Split(operatorFilter)[0]) == null || !OperatorIsValidForType(operatorFilter, typeof(T).GetProperty(filterParamUnique.Split(operatorFilter)[0]).PropertyType)) return null;
+            if (operatorFilter == null || operatorFilter == string.Empty) return null;
             DeserializeFilterProperty deserializeFilterProperty = new DeserializeFilterProperty();
             deserializeFilterProperty.Operator = operatorFilter;
+            if(typeof(T).GetProperty(filterParamUnique.Split(operatorFilter)[0]) == null) return deserializeFilterProperty;
             deserializeFilterProperty.PropertyName = filterParamUnique.Split(operatorFilter)[0];
+
             var valor = filterParamUnique.Split(operatorFilter)[1];
             if(!(valor == null || valor == string.Empty))
             {
