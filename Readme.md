@@ -53,7 +53,7 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 | `decimal`  | `==`, `!=`, `>`, `<`, `>=`, `<=` |
 | `DateTime` | `==`, `!=`, `>`, `<`, `>=`, `<=` |
 | `bool`     | `==`, `!=` |
-| `Array`    | `@=`, `!@=` Si se quiere evaluar una lista de datos cuando se separa por `/|` aplican estos dos operadores |
+| `Array`    | `@=`, `!@=` Si se quiere evaluar una lista de datos cuando se separa por el operado pipe aplica alguno de estos dos operadores |
 
 ## Ejemplo de filtro
 
