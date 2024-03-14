@@ -5,10 +5,18 @@ using System.Reflection;
 
 namespace FilterSort.Helpers;
 
+/// <summary>
+///    Author:   Edwin Ibarra
+///    Create Date: 14/03/2024
+///    Description: Clase que se encarga de generar el BinaryExpression principal para luego convertirlo en una Lambda
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class GenerateBinaryExpression<T>
 {
     /// <summary>
-    /// Deserializa cada segmento de la cadena de filtro y para cada segmento genera la expresion binaria
+    ///    Author:   Edwin Ibarra
+    ///    Create Date: 14/03/2024
+    ///    Deserializa cada segmento de la cadena de filtro y para cada segmento genera la expresion binaria
     /// </summary>
     /// <param name="parameter"></param>
     /// <param name="filterParam"></param>
@@ -53,7 +61,9 @@ public class GenerateBinaryExpression<T>
     }
 
     /// <summary>
-    /// Deserializa cada segmento de la cadena de filtro
+    ///    Author:   Edwin Ibarra
+    ///    Create Date: 14/03/2024
+    ///    Deserializa cada segmento de la cadena de filtro
     /// </summary>
     /// <param name="filterParamUnique"></param>
     /// <returns>
@@ -95,7 +105,9 @@ public class GenerateBinaryExpression<T>
         return deserializeFilterProperty;
     }
     /// <summary>
-    /// Operator is valid for type, evaluamos si el operador es valido para el tipo de dato que se esta evaluando
+    ///    Author:   Edwin Ibarra
+    ///    Create Date: 14/03/2024
+    ///    Operator is valid for type, evaluamos si el operador es valido para el tipo de dato que se esta evaluando
     /// </summary>
     /// <param name="operatorFilter"></param>
     /// <param name="type"></param>
@@ -165,7 +177,9 @@ public class GenerateBinaryExpression<T>
     }
 
     /// <summary>
-    /// Lista las propiedades que son buscables
+    ///    Author:   Edwin Ibarra
+    ///    Create Date: 14/03/2024
+    ///    Lista las propiedades que son buscables
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>

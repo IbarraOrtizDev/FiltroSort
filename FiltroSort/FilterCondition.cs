@@ -4,12 +4,16 @@ using FilterSort.Helpers;
 namespace FilterSort
 {
     /// <summary>
-    /// Class FilterCondition, esta clase se encarga de generar la expresion de condicion
+    ///    Author:   Edwin Ibarra
+    ///    Create Date: 14/03/2024
+    ///    Class FilterCondition, esta clase se encarga de generar la expresion de condicion
     /// </summary>
     public class FilterCondition
     {
         /// <summary>
-        /// BinaryExpression, este metodo se encarga de generar la expresion binaria, la cual se utiliza para generar la expresion de condicion, cuando el parametro de busqueda values no es vacio, se utiliza el operador IN o NOT IN
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    BinaryExpression, este metodo se encarga de generar la expresion binaria, la cual se utiliza para generar la expresion de condicion, cuando el parametro de busqueda values no es vacio, se utiliza el operador IN o NOT IN
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="operatorFilter"></param>
@@ -61,7 +65,9 @@ namespace FilterSort
         }
 
         /// <summary>
-        /// BinaryExpression, este metodo se encarga de generar la expresion binaria, es utilizado cuando el filtro es unico y no se establecio propiedad, en este caso se busca en todas las propiedades [Searchable] del modelo
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    BinaryExpression, este metodo se encarga de generar la expresion binaria, es utilizado cuando el filtro es unico y no se establecio propiedad, en este caso se busca en todas las propiedades [Searchable] del modelo
         /// </summary>
         /// <param name="listProperties"></param>
         /// <param name="parameter"></param>
@@ -89,7 +95,9 @@ namespace FilterSort
         }
 
         /// <summary>
-        /// resolveContains, este metodo se encarga de generar la expresion binaria para el operador Contains
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveContains, este metodo se encarga de generar la expresion binaria para el operador Contains
         /// </summary>
         /// <param name="property"></param>
         /// <param name="typeValue"></param>
@@ -102,9 +110,11 @@ namespace FilterSort
             MethodCallExpression callExpression = Expression.Call(property, "Contains", null, constant);
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveNotContains, este metodo se encarga de generar la expresion binaria para el operador Not Contains
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveNotContains, este metodo se encarga de generar la expresion binaria para el operador Not Contains
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -117,9 +127,11 @@ namespace FilterSort
             var notContains = Expression.Not(callExpression);
             return Expression.Equal(notContains, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveStartWith, este metodo se encarga de generar la expresion binaria para el operador Start With
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveStartWith, este metodo se encarga de generar la expresion binaria para el operador Start With
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -131,9 +143,11 @@ namespace FilterSort
             MethodCallExpression callExpression = Expression.Call(property, "StartsWith", null, constant);
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveNotStartWith, este metodo se encarga de generar la expresion binaria para el operador Not Start With
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveNotStartWith, este metodo se encarga de generar la expresion binaria para el operador Not Start With
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -146,9 +160,11 @@ namespace FilterSort
             var notStartWith = Expression.Not(callExpression);
             return Expression.Equal(notStartWith, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveEndWith, este metodo se encarga de generar la expresion binaria para el operador End With
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveEndWith, este metodo se encarga de generar la expresion binaria para el operador End With
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -160,9 +176,11 @@ namespace FilterSort
             MethodCallExpression callExpression = Expression.Call(property, "EndsWith", null, constant);
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveNotEndWith, este metodo se encarga de generar la expresion binaria para el operador Not End With
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveNotEndWith, este metodo se encarga de generar la expresion binaria para el operador Not End With
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -175,9 +193,11 @@ namespace FilterSort
             var notEndWith = Expression.Not(callExpression);
             return Expression.Equal(notEndWith, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveContainsCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Contains ignorando mayusculas y minusculas
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveContainsCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Contains ignorando mayusculas y minusculas
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -189,9 +209,11 @@ namespace FilterSort
             MethodCallExpression callExpression = Expression.Call(property, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveStartWithCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Start With ignorando mayusculas y minusculas
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveStartWithCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Start With ignorando mayusculas y minusculas
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -203,9 +225,11 @@ namespace FilterSort
             MethodCallExpression callExpression = Expression.Call(property, "StartsWith", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveEndWithCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador End With ignorando mayusculas y minusculas
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveEndWithCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador End With ignorando mayusculas y minusculas
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -217,9 +241,11 @@ namespace FilterSort
             MethodCallExpression callExpression = Expression.Call(property, "EndsWith", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveEqualsCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Equals ignorando mayusculas y minusculas
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveEqualsCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Equals ignorando mayusculas y minusculas
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -231,9 +257,11 @@ namespace FilterSort
             MethodCallExpression callExpression = Expression.Call(property, "Equals", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             return Expression.Equal(callExpression, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveNotEqualCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Not Equal ignorando mayusculas y minusculas
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveNotEqualCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Not Equal ignorando mayusculas y minusculas
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -246,9 +274,11 @@ namespace FilterSort
             var notEquals = Expression.Not(callExpression);
             return Expression.Equal(notEquals, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveNotContainsCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Not Contains ignorando mayusculas y minusculas
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveNotContainsCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Not Contains ignorando mayusculas y minusculas
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -261,9 +291,11 @@ namespace FilterSort
             var notContains = Expression.Not(callExpression);
             return Expression.Equal(notContains, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveNotStartWithCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Not Start With ignorando mayusculas y minusculas
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveNotStartWithCaseInsensitive, este metodo se encarga de generar la expresion binaria para el operador Not Start With ignorando mayusculas y minusculas
         /// </summary>
         /// <param name="property"></param>
         /// <param name="constant"></param>
@@ -274,9 +306,11 @@ namespace FilterSort
             var notStartWith = Expression.Not(callExpression);
             return Expression.Equal(notStartWith, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveInOrNotIn, este metodo se encarga de generar la expresion binaria donde evalua si el valor esta en la lista de valores, de acuerdo al parametro isIn, valida si el valor esta en la lista de valores o no
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveInOrNotIn, este metodo se encarga de generar la expresion binaria donde evalua si el valor esta en la lista de valores, de acuerdo al parametro isIn, valida si el valor esta en la lista de valores o no
         /// </summary>
         /// <param name="property"></param>
         /// <param name="values"></param>
@@ -292,9 +326,11 @@ namespace FilterSort
             var notStartWith = Expression.Not(call);
             return Expression.NotEqual(notStartWith, Expression.Constant(true));
         }
-        
+
         /// <summary>
-        /// resolveContainsMethod, este metodo se encarga de generar la expresion de llamada a metodo Contains, de acuerdo al tipo de valor
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    resolveContainsMethod, este metodo se encarga de generar la expresion de llamada a metodo Contains, de acuerdo al tipo de valor
         /// </summary>
         /// <param name="property"></param>
         /// <param name="values"></param>

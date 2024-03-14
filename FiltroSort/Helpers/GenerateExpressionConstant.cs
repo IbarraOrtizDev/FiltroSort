@@ -3,12 +3,16 @@
 namespace FilterSort.Helpers
 {
     /// <summary>
-    /// Generate Expression Constant, esta clase se encarga de generar la expresion constante
+    ///    Author:   Edwin Ibarra
+    ///    Create Date: 14/03/2024
+    ///     Generate Expression Constant, esta clase se encarga de generar la expresion constante
     /// </summary>
     public class GenerateExpressionConstant
     {
         /// <summary>
-        /// Get Expression Constant, este metodo se encarga de obtener la expresion constante
+        ///    Author:   Edwin Ibarra
+        ///    Create Date: 14/03/2024
+        ///    Get Expression Constant, este metodo se encarga de obtener la expresion constante
         /// </summary>
         /// <param name="operatorFilter"></param>
         /// <param name="value"></param>

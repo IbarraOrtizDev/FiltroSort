@@ -1,6 +1,8 @@
 ﻿namespace FilterSort.Models;
 /// <summary>
-/// Es la clase que se encarga de deserializar las propiedades del filtro
+///    Author:   Edwin Ibarra
+///    Create Date: 14/03/2024
+///    Es la clase que se encarga de deserializar las propiedades del filtro
 /// </summary>
 public class DeserializeFilterProperty
 {
