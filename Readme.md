@@ -7,9 +7,6 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 ``` C#
 {
 	Filters: "",
-	OrderBy: "",
-	Page: 1,
-	PageSize: 10
 }
 ```
 
