@@ -39,10 +39,12 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 | `!_=*`     | Case-insensitive string does not Starts with |
 
 ## Nota : 
-1.	Si el operador no es valido sera ignorado.
-2.	Si el tipo de dato del filtro no corresponde al tipo de dato de la propiedad, este sera ignorado.
-3.	Si la clave valor que se pase en el filtro no tiene valor, este sera ignorado.
-4.	Los operadores no son aplicables a todos los tipo de datos.
+1. Si el operador no es valido y solo se tiene una propiedad filtrable en el queryparam, la sección del filtro sera tomada como un valor a buscar en todas las propiedades [Searchable], de lo contrario sera ignorada.
+2. Si el tipo de dato del filtro no corresponde al tipo de dato de la propiedad, este sera ignorado.
+3. Si la clave valor que se pase en el filtro no tiene valor, este sera ignorado.
+4. Los operadores no son aplicables a todos los tipo de datos.
+5. Si el filtro es vacio, se retornara una lambda que siempre retorna true.
+6. Para buscar en todas las propiedades [Searchable] se debe pasar el filtro como un valor sin operador.
 
 ## Los operadores aplicables a los tipos de datos son los siguientes:
 

@@ -43,7 +43,6 @@ namespace FilterSort
                 _ => throw new ArgumentException("Invalid operator filter")
             };
         }
-
         public static BinaryExpression BinaryExpression(List<string> listProperties, ParameterExpression parameter, string value)
         {
             BinaryExpression binaryExpressionsReturn = null;
@@ -51,16 +50,17 @@ namespace FilterSort
             foreach (var property in listProperties)
             {
                 var propertyExp = Expression.Property(parameter, property);
-                MethodCallExpression callExpression = Expression.Call(propertyExp, "Contains", null, constant);
+                var toStringMethod = typeof(object).GetMethod("ToString");
+                var toStringCall = Expression.Call(propertyExp, toStringMethod);
+                MethodCallExpression callExpression = Expression.Call(toStringCall, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
                 var expValidate = Expression.Equal(callExpression, Expression.Constant(true));
-                if(binaryExpressionsReturn == null)
+                if (binaryExpressionsReturn == null)
                     binaryExpressionsReturn = expValidate;
                 else
                     binaryExpressionsReturn = Expression.OrElse(binaryExpressionsReturn, expValidate);
             }
             return binaryExpressionsReturn;
         }
-
         private static BinaryExpression resolveContains(Expression property, Type typeValue, Expression constant)
         {
             MethodCallExpression callExpression = Expression.Call(property, "Contains", null, constant);
@@ -132,7 +132,6 @@ namespace FilterSort
             var notStartWith = Expression.Not(callExpression);
             return Expression.Equal(notStartWith, Expression.Constant(true));
         }
-
         private static BinaryExpression resolveInOrNotIn(Expression property, List<string> values, Type typeValue, bool isIn)
         {
             MethodCallExpression call = resolveContainsMethod(property, values, typeValue);
@@ -142,7 +141,6 @@ namespace FilterSort
             var notStartWith = Expression.Not(call);
             return Expression.NotEqual(notStartWith, Expression.Constant(true));
         }
-
         private static MethodCallExpression resolveContainsMethod(Expression property, List<string> values, Type typeValue)
         {
             MethodCallExpression call;

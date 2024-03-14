@@ -42,12 +42,13 @@ namespace FiltroSort
                 else
                 {
                     if (conditionData == null || conditionData.PropertyName == null || !OperatorIsValidForType(conditionData.Operator, typeof(T).GetProperty(conditionData.PropertyName).PropertyType)) continue;
+
+                    if ((conditionData.Value == null && conditionData.Values == null)
+                        || !propertiesList.Contains(conditionData.PropertyName)) continue;
                     var property = typeof(T).GetProperty(conditionData.PropertyName);
                     condition = FilterCondition.BinaryExpression(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Value, conditionData.Values, property.PropertyType);
                     if (condition == null) continue;
                 };
-                if((conditionData.Value == null && conditionData.Values == null) 
-                    || !propertiesList.Contains(conditionData.PropertyName)) continue;
                 
                 if (binaryExpressions == null)
                     binaryExpressions = condition;
