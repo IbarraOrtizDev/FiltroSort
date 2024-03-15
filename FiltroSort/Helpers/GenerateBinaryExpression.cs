@@ -34,20 +34,22 @@ public class GenerateBinaryExpression<T>
 
         foreach (var filter in listFilters)
         {
-            var conditionData = GetConditionExpression(filter);
+            var conditionData = new DeserializeFilterProperty<T>(filter);
             BinaryExpression condition = null;
-            if (conditionData == null && listFilters.Count == 1)
+            if (string.IsNullOrEmpty(conditionData.PropertyName) && string.IsNullOrEmpty(conditionData.Operator) && listFilters.Count == 1)
             {
-                condition = FilterCondition.BinaryExpression(propertiesList, parameter, filterParam);
+                condition = FilterCondition.BinaryExpression(propertiesList, parameter, listFilters);
             }
             else
             {
-                if (conditionData == null || conditionData.PropertyName == null || !OperatorIsValidForType(conditionData.Operator, typeof(T).GetProperty(conditionData.PropertyName).PropertyType)) continue;
+                if (conditionData.PropertyName == null 
+                    || !OperatorIsValidForType(conditionData.Operator, typeof(T).GetProperty(conditionData.PropertyName).PropertyType)
+                    || (conditionData.Values == null && conditionData.Values.Count == 0)
+                    || !propertiesList.Contains(conditionData.PropertyName)
+                    ) continue;
 
-                if ((conditionData.Value == null && conditionData.Values == null)
-                    || !propertiesList.Contains(conditionData.PropertyName)) continue;
                 var property = typeof(T).GetProperty(conditionData.PropertyName);
-                condition = FilterCondition.BinaryExpression(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Value, conditionData.Values, property.PropertyType);
+                condition = FilterCondition.BinaryExpression(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Values, property.PropertyType);
                 if (condition == null) continue;
             };
 
@@ -58,51 +60,6 @@ public class GenerateBinaryExpression<T>
         }
 
         return binaryExpressions;
-    }
-
-    /// <summary>
-    ///    Author:   Edwin Ibarra
-    ///    Create Date: 14/03/2024
-    ///    Deserializa cada segmento de la cadena de filtro
-    /// </summary>
-    /// <param name="filterParamUnique"></param>
-    /// <returns>
-    /// Retorna un objeto de tipo DeserializeFilterProperty, donde esta la propiedad, el valor y el operador
-    /// </returns>
-    private static DeserializeFilterProperty GetConditionExpression(string filterParamUnique)
-    {
-        var listOperators = new List<string> { "!_=*", "!@=*", "_-=*", "!_-=", "_-=", "!@=", "!_=", "@=*", "_=*", "==*", "!=*", "==", "!=", ">=", "<=", "@=", "_=", ">", "<" };
-
-        string operatorFilter = string.Empty;
-
-        foreach (var item in listOperators)
-        {
-            if (filterParamUnique.Contains(item))
-            {
-                operatorFilter = item;
-                break;
-            }
-        }
-        if (operatorFilter == null || operatorFilter == string.Empty) return null;
-        DeserializeFilterProperty deserializeFilterProperty = new DeserializeFilterProperty();
-        deserializeFilterProperty.Operator = operatorFilter;
-        if (typeof(T).GetProperty(filterParamUnique.Split(operatorFilter)[0]) == null) return deserializeFilterProperty;
-        deserializeFilterProperty.PropertyName = filterParamUnique.Split(operatorFilter)[0];
-
-        var valor = filterParamUnique.Split(operatorFilter)[1];
-        if (!(valor == null || valor == string.Empty))
-        {
-            if (valor.Contains("|"))
-            {
-                deserializeFilterProperty.Values = valor.Split('|').ToList();
-            }
-            else
-            {
-                deserializeFilterProperty.Value = valor;
-            }
-
-        }
-        return deserializeFilterProperty;
     }
     /// <summary>
     ///    Author:   Edwin Ibarra
