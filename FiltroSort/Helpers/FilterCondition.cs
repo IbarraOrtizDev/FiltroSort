@@ -219,7 +219,7 @@ public class FilterCondition
     private static MethodCallExpression resolveContainsMethod(Expression property, List<string> values, Type typeValue)
     {
         MethodCallExpression call;
-        typeValue = Nullable.GetUnderlyingType(typeValue) ?? typeValue;
+        typeValue = typeValueNotNull(typeValue);
         switch (typeValue)
         {
             case Type t when t == typeof(int):
@@ -273,7 +273,7 @@ public class FilterCondition
         Expression constant = null;
         try
         {
-            typeValue = Nullable.GetUnderlyingType(typeValue) ?? typeValue;
+            typeValue = typeValueNotNull(typeValue);
             if (operatorFilter == "IN" || operatorFilter == "NOT IN")
             {
                 switch (typeValue)
@@ -337,5 +337,10 @@ public class FilterCondition
         }
 
         return constant;
+    }
+
+    public static Type typeValueNotNull(Type typeValue)
+    {
+           return Nullable.GetUnderlyingType(typeValue) ?? typeValue;
     }
 }
