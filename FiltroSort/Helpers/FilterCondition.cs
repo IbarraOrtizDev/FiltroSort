@@ -276,54 +276,47 @@ public class FilterCondition
             typeValue = Nullable.GetUnderlyingType(typeValue) ?? typeValue;
             if (operatorFilter == "IN" || operatorFilter == "NOT IN")
             {
-                if (typeValue == typeof(int))
+                switch (typeValue)
                 {
-                    List<int> list = values.Select(x => Convert.ToInt32(x)).ToList();
-                    constant = Expression.Constant(list, typeof(List<int>));
-                }
-                else if (typeValue == typeof(decimal))
-                {
-                    List<decimal> list = values.Select(x => Convert.ToDecimal(x)).ToList();
-                    constant = Expression.Constant(list, typeof(List<decimal>));
-                }
-                else if (typeValue == typeof(double))
-                {
-                    List<double> list = values.Select(x => Convert.ToDouble(x)).ToList();
-                    constant = Expression.Constant(list, typeof(List<double>));
-                }
-                else if (typeValue == typeof(float))
-                {
-                    List<float> list = values.Select(x => Convert.ToSingle(x)).ToList();
-                    constant = Expression.Constant(list, typeof(List<float>));
-                }
-                else if (typeValue == typeof(long))
-                {
-                    List<long> list = values.Select(x => Convert.ToInt64(x)).ToList();
-                    constant = Expression.Constant(list, typeof(List<long>));
-                }
-                else if (typeValue == typeof(short))
-                {
-                    List<short> list = values.Select(x => Convert.ToInt16(x)).ToList();
-                    constant = Expression.Constant(list, typeof(List<short>));
-                }
-                else if (typeValue == typeof(byte))
-                {
-                    List<byte> list = values.Select(x => Convert.ToByte(x)).ToList();
-                    constant = Expression.Constant(list, typeof(List<byte>));
-                }
-                else if (typeValue == typeof(bool))
-                {
-                    List<bool> list = values.Select(x => Convert.ToBoolean(x)).ToList();
-                    constant = Expression.Constant(list, typeof(List<bool>));
-                }
-                else if (typeValue == typeof(DateTime))
-                {
-                    List<DateTime> list = values.Select(x => Convert.ToDateTime(x)).ToList();
-                    constant = Expression.Constant(list, typeof(List<DateTime>));
-                }
-                else
-                {
-                    constant = Expression.Constant(values, typeof(List<string>));
+                    case Type t when t == typeof(int):
+                        List<int> intList = values.Select(x => Convert.ToInt32(x)).ToList();
+                        constant = Expression.Constant(intList, typeof(List<int>));
+                        break;
+                    case Type t when t == typeof(decimal):
+                        List<decimal> decimalList = values.Select(x => Convert.ToDecimal(x)).ToList();
+                        constant = Expression.Constant(decimalList, typeof(List<decimal>));
+                        break;
+                    case Type t when t == typeof(double):
+                        List<double> doubleList = values.Select(x => Convert.ToDouble(x)).ToList();
+                        constant = Expression.Constant(doubleList, typeof(List<double>));
+                        break;
+                    case Type t when t == typeof(float):
+                        List<float> floatList = values.Select(x => Convert.ToSingle(x)).ToList();
+                        constant = Expression.Constant(floatList, typeof(List<float>));
+                        break;
+                    case Type t when t == typeof(long):
+                        List<long> longList = values.Select(x => Convert.ToInt64(x)).ToList();
+                        constant = Expression.Constant(longList, typeof(List<long>));
+                        break;
+                    case Type t when t == typeof(short):
+                        List<short> shortList = values.Select(x => Convert.ToInt16(x)).ToList();
+                        constant = Expression.Constant(shortList, typeof(List<short>));
+                        break;
+                    case Type t when t == typeof(byte):
+                        List<byte> byteList = values.Select(x => Convert.ToByte(x)).ToList();
+                        constant = Expression.Constant(byteList, typeof(List<byte>));
+                        break;
+                    case Type t when t == typeof(bool):
+                        List<bool> boolList = values.Select(x => Convert.ToBoolean(x)).ToList();
+                        constant = Expression.Constant(boolList, typeof(List<bool>));
+                        break;
+                    case Type t when t == typeof(DateTime):
+                        List<DateTime> dateTimeList = values.Select(x => Convert.ToDateTime(x)).ToList();
+                        constant = Expression.Constant(dateTimeList, typeof(List<DateTime>));
+                        break;
+                    default:
+                        constant = Expression.Constant(values, typeof(List<string>));
+                        break;
                 }
             }
             else
