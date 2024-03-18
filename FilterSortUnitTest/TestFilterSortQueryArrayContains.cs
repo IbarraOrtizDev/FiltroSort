@@ -45,7 +45,7 @@
             var data = _data.AsQueryable().Where(filt).ToList();
 
             var filters = new List<DateTime> { DateTime.Parse("2022-01-01"), DateTime.Parse("2022-01-02") };
-            var dataCount = _data.Where(x => filters.Contains(x.propiedadFecha) && x.propiedadBooleana==true).ToList();
+            var dataCount = _data.Where(x => filters.Contains((DateTime)x.propiedadFecha) && x.propiedadBooleana==true).ToList();
             //assert
             Assert.AreEqual(dataCount.Count, data.Count);
         }
@@ -60,7 +60,7 @@
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
             var filters = new List<int> { 18, 19, 20, 50 };
-            var dataCount = _data.Where(x => filters.Contains(x.propiedadEntera)).ToList();
+            var dataCount = _data.Where(x => filters.Contains((int)x.propiedadEntera)).ToList();
             //assert
             Assert.AreEqual(dataCount.Count, data.Count);
         }

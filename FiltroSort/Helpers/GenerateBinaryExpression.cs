@@ -73,6 +73,7 @@ public class GenerateBinaryExpression<T>
     /// </returns>
     private static bool OperatorIsValidForType(string operatorFilter, Type type)
     {
+        type = Nullable.GetUnderlyingType(type) ?? type;
         if (type == typeof(string))
         {
             return operatorFilter switch

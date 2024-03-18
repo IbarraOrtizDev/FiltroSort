@@ -38,6 +38,9 @@ namespace FilterSort.Helpers
         /// <returns></returns>
         public static MethodCallExpression methodCall(Expression property, List<string> values)
         {
+            if (Nullable.GetUnderlyingType(property.Type) != null)
+                property = Expression.Convert(property, Nullable.GetUnderlyingType(property.Type));
+            
             var constant = Expression.Constant(GetList(values), typeof(List<T>));
             var method = typeof(List<T>).GetMethod("Contains", new[] { typeof(T) });
             var call = Expression.Call(constant, method, property);
