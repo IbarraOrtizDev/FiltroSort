@@ -53,7 +53,8 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 | `decimal`  | `==`, `!=`, `>`, `<`, `>=`, `<=` |
 | `DateTime` | `==`, `!=`, `>`, `<`, `>=`, `<=` |
 | `bool`     | `==`, `!=` |
-| `Array`    | `@=`, `!@=` Si se quiere evaluar una lista de datos cuando se separa por el operado pipe aplica alguno de estos dos operadores |
+| `List<string>,List<int> (tipos basicos)`     | `@=`, `!@=`,`<`, `<=`,`>`, `>=` Se utiliza cuando se quiere evaluar los valores de una lista, tener en cuenta que los operadores >, >=, < y <= aplican solo para el Count de la lista|
+| `Array`    | `@=`, `!@=` Si se quiere evaluar una lista de datos cuando se separa por el operado pipe aplica alguno de estos dos operadores, esto solo aplica solo en el filtro |
 
 ## Ejemplo de filtro
 
@@ -88,6 +89,29 @@ El resultado del filtro es una expresión lambda que se puede aplicar a una list
 ``` C#
 using FilterSoft;
 string filter = "propertyName==value,propertyAge>=20,city@=Medellín|Bogota";
+var lista = new List<YourClass>();
+FilterSoft<YourClass> filterSoft = new FilterSoft<YourClass>();
+var filter = filterSoft.GetFilterExpression(filter);
+lista.Where(filter).ToList();
+```
+
+## Buscar un elemento en una lista de datos
+
+``` C#
+using FilterSoft;
+string filter = "propertyName@=value1";
+//propertyName es una lista de string
+var lista = new List<YourClass>();
+FilterSoft<YourClass> filterSoft = new FilterSoft<YourClass>();
+var filter = filterSoft.GetFilterExpression(filter);
+lista.Where(filter).ToList();
+```
+
+## Buscar un valor nulo en una propiedad, se puede utilizar el operador ==null o !=null
+
+``` C#
+using FilterSoft;
+string filter = "propertyName==null";
 var lista = new List<YourClass>();
 FilterSoft<YourClass> filterSoft = new FilterSoft<YourClass>();
 var filter = filterSoft.GetFilterExpression(filter);
