@@ -3,91 +3,110 @@
     "propiedadString": "Texto0",
     "propiedadBooleana": true,
     "propiedadEntera": 0,
-    "propiedadFecha": "2022-01-01T00:00:00"
+    "propiedadFecha": "2022-01-01T00:00:00",
+    "propiedadListaString" :  ["Texto1", "Texto2"],
   },
   {
     "propiedadString": "Texto1",
     "propiedadBooleana": false,
     "propiedadEntera": 1,
-    "propiedadFecha": "2022-01-02T00:00:00"
+    "propiedadFecha": "2022-01-02T00:00:00",
+    "propiedadListaEntera": [
+      1,
+      2,
+      3
+    ],
   },
   {
     "propiedadString": "Texto2",
     "propiedadBooleana": true,
     "propiedadEntera": 2,
-    "propiedadFecha": "2022-01-03T00:00:00"
+    "propiedadFecha": "2022-01-03T00:00:00",
+    "propiedadListaString": [ "Texto1", "Texto4", "Texto5" ]
   },
   {
     "propiedadString": "Texto3",
     "propiedadBooleana": false,
     "propiedadEntera": 3,
-    "propiedadFecha": "2022-01-04T00:00:00"
+    "propiedadFecha": "2022-01-04T00:00:00",
+    "propiedadListaEntera": [ 1, 4, 5 ]
   },
   {
     "propiedadString": "Texto4",
     "propiedadBooleana": true,
     "propiedadEntera": 4,
-    "propiedadFecha": "2022-01-05T00:00:00"
+    "propiedadFecha": "2022-01-05T00:00:00",
+    "propiedadListaString": [ "Texto2", "Texto3", "Texto6" ]
   },
   {
     "propiedadString": "Texto5",
     "propiedadBooleana": false,
     "propiedadEntera": 5,
-    "propiedadFecha": "2022-01-06T00:00:00"
+    "propiedadFecha": "2022-01-06T00:00:00",
+    "propiedadListaEntera": [ 2, 3, 6 ]
   },
   {
     "propiedadString": "Texto6",
     "propiedadBooleana": true,
     "propiedadEntera": 6,
-    "propiedadFecha": "2022-01-07T00:00:00"
+    "propiedadFecha": "2022-01-07T00:00:00",
+    "propiedadListaString": [ "Texto3", "Texto5", "Texto7" ]
   },
   {
     "propiedadString": "Texto7",
     "propiedadBooleana": false,
     "propiedadEntera": 7,
-    "propiedadFecha": "2022-01-08T00:00:00"
+    "propiedadFecha": "2022-01-08T00:00:00",
+    "propiedadListaEntera": [ 3, 4, 7 ]
   },
   {
     "propiedadString": "Texto8",
     "propiedadBooleana": true,
     "propiedadEntera": 8,
-    "propiedadFecha": "2022-01-09T00:00:00"
+    "propiedadFecha": "2022-01-09T00:00:00",
+    "propiedadListaString": [ "Texto4", "Texto6", "Texto8" ]
   },
   {
     "propiedadString": "Texto9",
     "propiedadBooleana": false,
     "propiedadEntera": 9,
-    "propiedadFecha": "2022-01-10T00:00:00"
+    "propiedadFecha": "2022-01-10T00:00:00",
+    "propiedadListaEntera": [ 4, 5, 8 ]
   },
   {
     "propiedadString": "Texto10",
     "propiedadBooleana": true,
     "propiedadEntera": 10,
-    "propiedadFecha": "2022-01-11T00:00:00"
+    "propiedadFecha": "2022-01-11T00:00:00",
+    "propiedadListaString": [ "Texto5", "Texto7", "Texto9" ]
   },
   {
     "propiedadString": "Texto11",
     "propiedadBooleana": false,
     "propiedadEntera": 11,
-    "propiedadFecha": "2022-01-12T00:00:00"
+    "propiedadFecha": "2022-01-12T00:00:00",
+    "propiedadListaEntera": [ 5, 6, 9 ]
   },
   {
     "propiedadString": "Texto12",
     "propiedadBooleana": true,
     "propiedadEntera": 12,
-    "propiedadFecha": "2022-01-13T00:00:00"
+    "propiedadFecha": "2022-01-13T00:00:00",
+    "propiedadListaString": [ "Texto6", "Texto8", "Texto10" ]
   },
   {
     "propiedadString": "Texto13",
     "propiedadBooleana": false,
     "propiedadEntera": 13,
-    "propiedadFecha": "2022-01-14T00:00:00"
+    "propiedadFecha": "2022-01-14T00:00:00",
+    "propiedadListaEntera": [ 6, 7, 10 ]
   },
   {
     "propiedadString": "Texto14",
     "propiedadBooleana": true,
     "propiedadEntera": 14,
-    "propiedadFecha": "2022-01-15T00:00:00"
+    "propiedadFecha": "2022-01-15T00:00:00",
+    "propiedadListaString": [ "Texto7", "Texto9", "Texto11" ]
   },
   {
     "propiedadString": "Texto15",

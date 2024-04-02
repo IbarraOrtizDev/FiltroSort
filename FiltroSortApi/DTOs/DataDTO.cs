@@ -16,5 +16,9 @@ namespace FiltroSortApi.DTOs
             get;
             set;
         }
+        [Searchable]
+        public List<string>? propiedadListaString { get; set;}
+        [Searchable]
+        public List<int>? propiedadListaEntera { get; set; }
     }
 }

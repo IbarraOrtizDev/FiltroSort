@@ -36,16 +36,17 @@ public class GenerateBinaryExpression<T>
         {
             var conditionData = new DeserializeFilterProperty<T>(filter);
             BinaryExpression condition = null;
-            if (string.IsNullOrEmpty(conditionData.PropertyName) && string.IsNullOrEmpty(conditionData.Operator) && listFilters.Count == 1)
+            if (string.IsNullOrEmpty(conditionData.PropertyName) && string.IsNullOrEmpty(conditionData.Operator))
             {
-                condition = FilterCondition.BinaryExpression(propertiesList, parameter, listFilters);
+                condition = FilterCondition.BinaryExpression<T>(propertiesList, parameter, new List<string>() { filter });
             }
             else
             {
-                if (conditionData.PropertyName == null 
-                    || !OperatorIsValidForType(conditionData.Operator, typeof(T).GetProperty(conditionData.PropertyName).PropertyType)
+                if (!(conditionData.Values.FirstOrDefault()?.ToLower() == "null" && conditionData.PropertyName != null)
+                    && (conditionData.PropertyName == null
                     || (conditionData.Values == null && conditionData.Values.Count == 0)
-                    || !propertiesList.Contains(conditionData.PropertyName)
+                    || !OperatorIsValidForType(conditionData.Operator, typeof(T).GetProperty(conditionData.PropertyName).PropertyType)
+                    || !propertiesList.Contains(conditionData.PropertyName))
                     ) continue;
 
                 var property = typeof(T).GetProperty(conditionData.PropertyName);
@@ -128,6 +129,16 @@ public class GenerateBinaryExpression<T>
             {
                 "==" => true,
                 "!=" => true,
+                _ => false
+            };
+        }else if (type.Name.Contains("List"))
+        {
+            return operatorFilter switch
+            {
+                ">" => true,
+                "<" => true,
+                ">=" => true,
+                "<=" => true,
                 _ => false
             };
         }

@@ -1,6 +1,12 @@
-﻿namespace FilterSortUnitTest
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FilterSortUnitTest
 {
-    public class TestFilterSortQueryMultipleFilters
+    public class TestFilterSortQueryCountList
     {
         List<DataDTO> _data;
         [SetUp]
@@ -17,105 +23,106 @@
         }
 
         [Test]
-        public void ValidateFilterDataMultipleFiltersBoolAndString()
+        public void ValidateFilterDataCountListString()
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadString==Texto18,propiedadBooleana==true";
+            filter.Filter = "propiedadListaString>0";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
-            var dataCount = _data.Where(x => x.propiedadString == "Texto18" && x.propiedadBooleana==true).ToList();
+            var dataCount = _data.Where(x => x.propiedadListaString?.Count()>0).ToList();
             //assert
             Assert.AreEqual(dataCount.Count, data.Count);
         }
 
         [Test]
-        public void ValidateFilterDataMultipleFiltersBoolAndStringTwo()
+        public void ValidateFilterDataCountListStringTwo()
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadString_=Texto1,propiedadBooleana==true";
+            filter.Filter = "propiedadListaString>2";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
-            var dataCount = _data.Where(x => x.propiedadString.StartsWith("Texto1") && x.propiedadBooleana == true).ToList();
+            var dataCount = _data.Where(x => x.propiedadListaString?.Count() > 2).ToList();
             //assert
             Assert.AreEqual(dataCount.Count, data.Count);
         }
 
         [Test]
-        public void ValidateFilterDataMultipleFiltersBoolStringAndDate()
+        public void ValidateFilterDataCountListInt()
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadString_=Texto1,propiedadBooleana==true,propiedadFecha==2022-01-01";
+            filter.Filter = "propiedadListaEntera>0";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
-            var dataCount = _data.Where(x => x.propiedadString.StartsWith("Texto1") && x.propiedadBooleana == true && x.propiedadFecha == Convert.ToDateTime("2022-01-01")).ToList();
+            var dataCount = _data.Where(x => x.propiedadListaEntera?.Count() > 0).ToList();
             //assert
             Assert.AreEqual(dataCount.Count, data.Count);
         }
 
         [Test]
-        public void ValidateFilterDataMultipleFiltersBoolStringAndDateContains()
+        public void ValidateFilterDataCountListIntLess()
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadString@=xto18,propiedadBooleana==true,propiedadFecha==2022-01-01";
+            filter.Filter = "propiedadListaEntera<3";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
-            var dataCount = _data.Where(x => x.propiedadString.Contains("xto18") && x.propiedadBooleana == true && x.propiedadFecha == Convert.ToDateTime("2022-01-01")).ToList();
-            //assert
-            Assert.AreEqual(dataCount.Count, data.Count);
-        }
-        [Test]
-        public void ValidateFilterDataMultipleFiltersBoolStringAndDateContainsNotBool()
-        {
-            //arrange
-            FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadString@=xto18,1829,propiedadFecha==2022-01-01";
-            //act
-            FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
-            var filt = filterSort.GetFilterExpression();
-            var data = _data.AsQueryable().Where(filt).ToList();
-            var dataCount = _data.Where(x => x.propiedadString.Contains("xto18") && x.propiedadFecha == Convert.ToDateTime("2022-01-01") && x.propiedadEntera == 1829).ToList();
+            var dataCount = _data.Where(x => x.propiedadListaEntera?.Count() < 3).ToList();
             //assert
             Assert.AreEqual(dataCount.Count, data.Count);
         }
 
         [Test]
-        public void ValidateFilterDataMultipleFiltersGreaterAndBool()
+        public void ValidateFilterDataCountListStringLessOrEquals()
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadEntera>=1000,propiedadFecha==2022-01-01";
+            filter.Filter = "propiedadListaString<=2";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
-            var dataCount = _data.Where(x => x.propiedadEntera >= 1000 && x.propiedadFecha == Convert.ToDateTime("2022-01-01")).ToList();
+            var dataCount = _data.Where(x => x.propiedadListaString?.Count() <= 2).ToList();
             //assert
             Assert.AreEqual(dataCount.Count, data.Count);
         }
 
         [Test]
-        public void ValidateFilterDataMultipleRangeDate()
+        public void ValidateFilterDataCountGreaterOrEquals()
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadFecha>=2022-01-01,propiedadFecha<=2022-01-15";
+            filter.Filter = "propiedadListaEntera>=0";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
-            var dataCount = _data.Where(x => x.propiedadFecha >= Convert.ToDateTime("2022-01-01") && x.propiedadFecha <= Convert.ToDateTime("2022-01-15")).ToList();
+            var dataCount = _data.Where(x => x.propiedadListaEntera?.Count() >= 0).ToList();
+            //assert
+            Assert.AreEqual(dataCount.Count, data.Count);
+        }
+
+        [Test]
+        public void ValidateFilterDataCountListIsNull()
+        {
+            //arrange
+            FilterSoftModel filter = new FilterSoftModel();
+            filter.Filter = "propiedadListaEntera==null";
+            //act
+            FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
+            var filt = filterSort.GetFilterExpression();
+            var data = _data.AsQueryable().Where(filt).ToList();
+            var dataCount = _data.Where(x => x.propiedadListaEntera == null).ToList();
             //assert
             Assert.AreEqual(dataCount.Count, data.Count);
         }

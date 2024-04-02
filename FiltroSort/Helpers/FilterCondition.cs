@@ -32,12 +32,32 @@ public class FilterCondition
         {
             operatorFilter = operatorFilter == "!@=" ? "NOT IN" : "IN";
         }
+
+        if (values[0].ToLower() == "null")
+        {
+            return operatorFilter switch
+            {
+                "==" => Expression.Equal(property, Expression.Constant(null)),
+                _ => Expression.NotEqual(property, Expression.Constant(null)),
+            };
+        }
+
         Expression constant = GetExpressionConstant(operatorFilter, values, typeValue);
 
         if(Nullable.GetUnderlyingType(typeValue) != null && !operatorFilter.Contains("IN"))
             constant = Expression.Convert(constant, typeValue);
 
         if (constant == null) return null;
+
+        if (typeValue.Name.Contains("List"))
+        {
+            return operatorFilter switch
+            {
+                "@=" => resolveGenericNegative(property, constant, "Equals", true),
+                "!@=" => resolveGenericNegative(property, constant, "Equals", true),
+                _ => resolveCountList(property, constant, operatorFilter)
+            };
+        }
 
         return operatorFilter switch
         {
@@ -77,17 +97,25 @@ public class FilterCondition
     /// <returns>
     /// Retorna la expresion binaria
     /// </returns>
-    public static BinaryExpression BinaryExpression(List<string> listProperties, ParameterExpression parameter, List<string> values)
+    public static BinaryExpression BinaryExpression<T>(List<string> listProperties, ParameterExpression parameter, List<string> values)
     {
         BinaryExpression binaryExpressionsReturn = null;
         Expression constant = GetExpressionConstant("@=", values, typeof(string));
+        BinaryExpression expValidate = null;
         foreach (var property in listProperties)
         {
-            var propertyExp = Expression.Property(parameter, property);
-            var toStringMethod = typeof(object).GetMethod("ToString");
-            var toStringCall = Expression.Call(propertyExp, toStringMethod);
-            MethodCallExpression callExpression = Expression.Call(toStringCall, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
-            var expValidate = Expression.Equal(callExpression, Expression.Constant(true));
+            if (typeof(T).GetProperty(property).PropertyType.Name.Contains("List"))
+            {
+                continue;
+            }
+            else
+            {
+                var propertyExp = Expression.Property(parameter, property);
+                var toStringMethod = typeof(object).GetMethod("ToString");
+                var toStringCall = Expression.Call(propertyExp, toStringMethod);
+                MethodCallExpression callExpression = Expression.Call(toStringCall, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                expValidate = Expression.Equal(callExpression, Expression.Constant(true));
+            }
             if (binaryExpressionsReturn == null)
                 binaryExpressionsReturn = expValidate;
             else
@@ -133,6 +161,30 @@ public class FilterCondition
         return Expression.Equal(callExpression, Expression.Constant(true));
     }
 
+    private static BinaryExpression resolveCountList(Expression propertyExp, Expression constant, string method)
+    {
+        var countProperty = Expression.Property(propertyExp, "Count");
+        var notNull = Expression.NotEqual(propertyExp, Expression.Constant(null));
+        BinaryExpression binaryComparation = null;
+        switch (method)
+        {
+            case ">":
+                binaryComparation = Expression.GreaterThan(countProperty, constant);
+                break;
+            case "<":
+                binaryComparation = Expression.LessThan(countProperty, constant);
+                break;
+            case ">=":
+            binaryComparation = Expression.GreaterThanOrEqual(countProperty, constant);
+                break;
+            case "<=":
+                binaryComparation = Expression.LessThanOrEqual(countProperty, constant);
+                break;
+            default:
+                throw new ArgumentException("Invalid operator filter");
+        };
+        return Expression.AndAlso(notNull, binaryComparation);
+    }
     private static BinaryExpression resolveEqualsIgnoreCase(Expression propertyExp, Expression constant)
     {
         MethodCallExpression callExpression;
@@ -324,6 +376,9 @@ public class FilterCondition
                 if (typeValue == typeof(string))
                 {
                     constant = Expression.Constant(values[0]);
+                }else if (typeValue.Name.Contains("List"))
+                {
+                    constant = Expression.Constant(Int32.Parse(values[0]));
                 }
                 else
                 {
