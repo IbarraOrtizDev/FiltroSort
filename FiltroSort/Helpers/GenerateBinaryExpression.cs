@@ -135,6 +135,8 @@ public class GenerateBinaryExpression<T>
         {
             return operatorFilter switch
             {
+                "@=" => true,
+                "!@=" => true,
                 ">" => true,
                 "<" => true,
                 ">=" => true,

@@ -33,6 +33,7 @@ public class FilterCondition
             operatorFilter = operatorFilter == "!@=" ? "NOT IN" : "IN";
         }
 
+        // If the value is null
         if (values[0].ToLower() == "null")
         {
             return operatorFilter switch
@@ -49,12 +50,13 @@ public class FilterCondition
 
         if (constant == null) return null;
 
+        //Evalua si la propiedad es una lista, si es asi, se evalua si el valor esta en la lista o no o si la cantidad de elementos es mayor o menor a un valor
         if (typeValue.Name.Contains("List"))
         {
             return operatorFilter switch
             {
-                "@=" => resolveGenericNegative(property, constant, "Equals", true),
-                "!@=" => resolveGenericNegative(property, constant, "Equals", true),
+                "@=" => resolveContainsList(property, constant, typeValue, "@="),
+                "!@=" => resolveContainsList(property, constant, typeValue, "!@="),
                 _ => resolveCountList(property, constant, operatorFilter)
             };
         }
@@ -101,9 +103,9 @@ public class FilterCondition
     {
         BinaryExpression binaryExpressionsReturn = null;
         Expression constant = GetExpressionConstant("@=", values, typeof(string));
-        BinaryExpression expValidate = null;
         foreach (var property in listProperties)
         {
+            BinaryExpression expValidate = null;
             if (typeof(T).GetProperty(property).PropertyType.Name.Contains("List"))
             {
                 continue;
@@ -161,6 +163,39 @@ public class FilterCondition
         return Expression.Equal(callExpression, Expression.Constant(true));
     }
 
+    /// <summary>
+    ///     Author:   Edwin Ibarra
+    ///     Create Date: 02/04/2024
+    ///     Se encarga de generar la expresion binaria para evaluar si el valor esta en la lista de valores
+    /// </summary>
+    /// <param name="propertyExp"></param>
+    /// <param name="constant"></param>
+    /// <param name="typeValue"></param>
+    /// <param name="method"></param>
+    /// <returns>BinaryExpression</returns>
+    private static BinaryExpression resolveContainsList(Expression propertyExp, Expression constant,Type typeValue, string method)
+    {
+        var notNull = Expression.NotEqual(propertyExp, Expression.Constant(null));
+        var contains = Expression.Call(propertyExp, typeValue.GetMethod("Contains", new[] { GetTypeList(typeValue) }), constant);
+        if(method == "!@=")
+        {
+            return Expression.AndAlso(notNull,Expression.Equal(Expression.Not(contains), Expression.Constant(true)));
+        }
+        var evaluationContain = Expression.Equal(contains, Expression.Constant(true));
+        return Expression.AndAlso(notNull,evaluationContain);
+
+    }
+
+    /// <summary>
+    ///     Author:   Edwin Ibarra
+    ///     Create Date: 02/04/2024
+    ///     Retorna la expresion binaria para evaluar la cantidad de elementos en una lista
+    /// </summary>
+    /// <param name="propertyExp"></param>
+    /// <param name="constant"></param>
+    /// <param name="method"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     private static BinaryExpression resolveCountList(Expression propertyExp, Expression constant, string method)
     {
         var countProperty = Expression.Property(propertyExp, "Count");
@@ -262,7 +297,7 @@ public class FilterCondition
     /// <summary>
     ///    Author:   Edwin Ibarra
     ///    Create Date: 14/03/2024
-    ///    resolveContainsMethod, este metodo se encarga de generar la expresion de llamada a metodo Contains, de acuerdo al tipo de valor
+    ///    resolveContainsMethod, este metodo se encarga de generar la expresion de llamada a metodo Contains, de acuerdo al tipo de valor, este se ejecuta cuando el valor es una lista de valores enviada por el usuario
     /// </summary>
     /// <param name="property"></param>
     /// <param name="values"></param>
@@ -378,7 +413,10 @@ public class FilterCondition
                     constant = Expression.Constant(values[0]);
                 }else if (typeValue.Name.Contains("List"))
                 {
-                    constant = Expression.Constant(Int32.Parse(values[0]));
+                    if(operatorFilter == "@=" || operatorFilter == "!@=")
+                        constant = Expression.Constant(Convert.ChangeType(values[0], GetTypeList(typeValue)));
+                    else
+                        constant = Expression.Constant(Int32.Parse(values[0]));
                 }
                 else
                 {
@@ -394,6 +432,60 @@ public class FilterCondition
         return constant;
     }
 
+    /// <summary>
+    /// Author:   Edwin Ibarra
+    /// Create Date: 02/04/2024
+    /// Retorna el tipo de la lista
+    /// </summary>
+    /// <param name="typeValue"></param>
+    /// <returns></returns>
+    public static Type GetTypeList(Type typeValue)
+    {
+        Type call;
+        typeValue = typeValueNotNull(typeValue);
+        switch (typeValue)
+        {
+            case Type t when t == typeof(List<int>):
+                call = typeof(int);
+                break;
+            case Type t when t == typeof(List<decimal>):
+                call = typeof(decimal);
+                break;
+            case Type t when t == typeof(List<double>):
+                call = typeof(double);
+                break;
+            case Type t when t == typeof(List<float>):
+                call = typeof(float);
+                break;
+            case Type t when t == typeof(List<long>):
+                call = typeof(long);
+                break;
+            case Type t when t == typeof(List<short>):
+                call = typeof(short);
+                break;
+            case Type t when t == typeof(List<byte>):
+                call = typeof(byte);
+                break;
+            case Type t when t == typeof(List<bool>):
+                call = typeof(bool);
+                break;
+            case Type t when t == typeof(List<DateTime>):
+                call = typeof(DateTime);
+                break;
+            default:
+                call = typeof(string);
+                break;
+        }
+        return call;
+    }
+
+    /// <summary>
+    /// Author:   Edwin Ibarra
+    /// Date: 14/03/2024
+    /// Quita el nullable de un tipo de dato y retorna el tipo de dato
+    /// </summary>
+    /// <param name="typeValue"></param>
+    /// <returns></returns>
     public static Type typeValueNotNull(Type typeValue)
     {
            return Nullable.GetUnderlyingType(typeValue) ?? typeValue;
