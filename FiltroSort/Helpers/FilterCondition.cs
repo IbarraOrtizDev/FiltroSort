@@ -69,7 +69,6 @@ public class FilterCondition
             LambdaExpression lambda = CreateAnyExpression(typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.GenericTypeArguments[0], removeOther, operatorFilter, values);
             var anyMethod = Expression.Call(typeof(Enumerable), "Any", new[] { typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.GetGenericArguments()[0] }, propiedadListaObjetos, lambda);
             return generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, Expression.Equal(anyMethod, Expression.Constant(true)));
-            //return generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, );
         }
 
         //Evalua si la propiedad es una lista, si es asi, se evalua si el valor esta en la lista o no o si la cantidad de elementos es mayor o menor a un valor
@@ -85,15 +84,22 @@ public class FilterCondition
         return generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, EvaluateTypePrimitive(property, constant, operatorFilter, values, typeValue));
     }
 
-
+    /// <summary>
+    /// Author:   Edwin Ibarra
+    /// Create Date: 04/04/2024
+    /// Crea la funcion lambda para evaluar si el valor esta en la lista de valores, es utilizado cuando la propiedad es una lista
+    /// </summary>
+    /// <param name="typeProperty"></param>
+    /// <param name="propertyName"></param>
+    /// <param name="operatorFilter"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
     private static LambdaExpression CreateAnyExpression(Type typeProperty, string propertyName, string operatorFilter, List<string> values )
     {
         var parameterY = Expression.Parameter(typeProperty, "y");
         MemberExpression propertyY = Expression.Property(parameterY, propertyName);
 
         var aaa= BinaryExpression(propertyName, operatorFilter, parameterY, values, typeProperty.GetProperty(propertyName).PropertyType, typeProperty, propertyY);
-
-        var anyMethod = typeof(Enumerable).GetMethods().First(x => x.Name == "Any" && x.GetParameters().Length == 2).MakeGenericMethod(typeProperty);
         var lambda = Expression.Lambda(aaa, parameterY);
         return lambda;
     }
