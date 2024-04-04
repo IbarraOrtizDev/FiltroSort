@@ -22,6 +22,8 @@ namespace FiltroSortApi.DTOs
         public List<int>? propiedadListaEntera { get; set; }
         [Searchable]
         public PropiedadObjeto? propiedadObjeto { get; set; }
+        [Searchable]
+        public List<PropiedadObjeto> propiedadListaObjetos { get; set; }
     }
     public class PropiedadObjeto
     {

@@ -46,7 +46,7 @@ public class GenerateBinaryExpression<T>
 
                 var property = GetPropertyInfo(conditionData.PropertyName!, typeof(T));
                 if (property == null) continue;
-                condition = FilterCondition.BinaryExpression(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Values, property.PropertyType);
+                condition = FilterCondition.BinaryExpression(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Values, property.PropertyType, typeof(T));
                 if (condition == null) continue;
             };
 
@@ -77,7 +77,12 @@ public class GenerateBinaryExpression<T>
                 if (propertiesList.Contains(x))
                 {
                     propertiesList = GetSearchableProperties(typeValue.GetProperty(x).PropertyType);
-                    typeValue = typeValue.GetProperty(x).PropertyType;
+                    if(typeValue.GetProperty(x).PropertyType.Name.Contains("List") && !FilterCondition.IsPrimitiveExtenssionProperty(typeValue.GetProperty(x).PropertyType.GetGenericArguments()[0]))
+                    {
+                        typeValue = typeValue.GetProperty(x).PropertyType.GetGenericArguments()[0];
+                    }
+                    else
+                        typeValue = typeValue.GetProperty(x).PropertyType;
                     filter = filter.Replace(x + ".", "");
                     found = true;
                 }
@@ -110,6 +115,10 @@ public class GenerateBinaryExpression<T>
             var properties = propertyName.Split('.');
             var property = typeValue.GetProperty(properties[0]);
             if (property == null) return null;
+            if(property.PropertyType.Name.Contains("List") && FilterCondition.IsPrimitiveExtenssionProperty(property.PropertyType))
+            {
+                return GetPropertyInfo(propertyName.Replace(properties[0] + ".", ""), property.PropertyType.GetGenericArguments()[0]);
+            }
             return GetPropertyInfo(propertyName.Replace(properties[0] + ".", ""), property.PropertyType);
         }
         PropertyInfo? propertyInfo = typeValue.GetProperty(propertyName);
@@ -211,6 +220,10 @@ public class GenerateBinaryExpression<T>
     /// </returns>
     public static List<string> GetSearchableProperties(Type typeObject)
     {
+        if(typeObject.Name.Contains("List") && !FilterCondition.IsPrimitiveExtenssionProperty(typeObject.GenericTypeArguments[0]))
+        {
+            return GetSearchableProperties(typeObject.GetGenericArguments()[0]);
+        }
         return typeObject.GetProperties()
             .Where(e => e.GetCustomAttribute<Searchable>(true) != null).Select(x => x.Name).ToList();
     }

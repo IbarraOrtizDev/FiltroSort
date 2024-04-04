@@ -5,13 +5,29 @@
     "propiedadEntera": 0,
     "propiedadFecha": "2022-01-01T00:00:00",
     "propiedadListaString": [ "Texto1", "Texto2" ],
-    "propiedadObjeto" : {
+    "propiedadObjeto": {
       "propiedadString": "Texto1-0",
       "propiedadBooleana": true,
       "propiedadEntera": 1,
       "propiedadFecha": "2022-01-02T00:00:00",
       "propiedadListaString": [ "Texto1", "Texto2" ]
-    }
+    },
+    "propiedadListaObjetos": [
+      {
+        "propiedadString": "Texto1-0",
+        "propiedadBooleana": true,
+        "propiedadEntera": 1,
+        "propiedadFecha": "2022-01-02T00:00:00",
+        "propiedadListaString": [ "Texto1", "Texto2" ]
+      },
+      {
+        "propiedadString": "Texto2-1",
+        "propiedadBooleana": true,
+        "propiedadEntera": 3,
+        "propiedadFecha": "2022-01-04T00:00:00",
+        "propiedadListaEntera": [ 1, 4, 5 ]
+      }
+    ]
   },
   {
     "propiedadString": "Texto1",
