@@ -4,7 +4,7 @@ FiltroSort busca ser una herramienta que permita a los usuarios filtrar y visual
 
 Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructura:
 
-``` C#
+```C#
 {
 	Filters: "",
 }
@@ -13,29 +13,31 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 # Documentación
 
 ## Operadores de filtro
-| Operator   | Meaning                  |
-|------------|--------------------------|
-| `==`       | Equals                   |
-| `!=`       | Not equals               |
-| `>`        | Greater than             |
-| `<`        | Less than                |
-| `>=`       | Greater than or equal to |
-| `<=`       | Less than or equal to    |
-| `@=`       | Contains                 |
-| `_=`       | Starts with              |
-| `_-=`      | Ends with                |
-| `!@=`      | Does not Contains        |
-| `!_=`      | Does not Starts with     |
-| `!_-=`     | Does not Ends with       |
-| `@=*`      | Case-insensitive string Contains |
-| `_=*`      | Case-insensitive string Starts with |
-| `_-=*`     | Case-insensitive string Ends with |
-| `==*`      | Case-insensitive string Equals |
-| `!=*`      | Case-insensitive string Not equals |
-| `!@=*`     | Case-insensitive string does not Contains |
-| `!_=*`     | Case-insensitive string does not Starts with |
 
-## Nota : 
+| Operator | Meaning                                      |
+| -------- | -------------------------------------------- |
+| `==`     | Equals                                       |
+| `!=`     | Not equals                                   |
+| `>`      | Greater than                                 |
+| `<`      | Less than                                    |
+| `>=`     | Greater than or equal to                     |
+| `<=`     | Less than or equal to                        |
+| `@=`     | Contains                                     |
+| `_=`     | Starts with                                  |
+| `_-=`    | Ends with                                    |
+| `!@=`    | Does not Contains                            |
+| `!_=`    | Does not Starts with                         |
+| `!_-=`   | Does not Ends with                           |
+| `@=*`    | Case-insensitive string Contains             |
+| `_=*`    | Case-insensitive string Starts with          |
+| `_-=*`   | Case-insensitive string Ends with            |
+| `==*`    | Case-insensitive string Equals               |
+| `!=*`    | Case-insensitive string Not equals           |
+| `!@=*`   | Case-insensitive string does not Contains    |
+| `!_=*`   | Case-insensitive string does not Starts with |
+
+## Nota :
+
 1. Si el operador no es valido y solo se tiene una propiedad filtrable en el queryparam, la sección del filtro sera tomada como un valor a buscar en todas las propiedades [Searchable], de lo contrario sera ignorada.
 2. Si el tipo de dato del filtro no corresponde al tipo de dato de la propiedad, este sera ignorado.
 3. Si la clave valor que se pase en el filtro no tiene valor, este sera ignorado.
@@ -45,29 +47,29 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 
 ## Los operadores aplicables a los tipos de datos son los siguientes:
 
-| Type       | Operator   |
-|------------|------------|
-| `string`   | `==`, `!=`, `@=`, `_=`, `_-=`, `!@=`, `!_=`, `!_-=`, `@=*`, `_=*`, `_-=*`, `==*`, `!=*`, `!@=*`, `!_=*` |
-| `int`      | `==`, `!=`, `>`, `<`, `>=`, `<=` |
-| `double`   | `==`, `!=`, `>`, `<`, `>=`, `<=` |
-| `decimal`  | `==`, `!=`, `>`, `<`, `>=`, `<=` |
-| `DateTime` | `==`, `!=`, `>`, `<`, `>=`, `<=` |
-| `bool`     | `==`, `!=` |
-| `List<string>,List<int> (tipos basicos)`     | `@=`, `!@=`,`<`, `<=`,`>`, `>=` Se utiliza cuando se quiere evaluar los valores de una lista, tener en cuenta que los operadores >, >=, < y <= aplican solo para el Count de la lista|
-| `Array`    | `@=`, `!@=` Si se quiere evaluar una lista de datos cuando se separa por el operado pipe aplica alguno de estos dos operadores, esto solo aplica solo en el filtro |
+| Type                                     | Operator                                                                                                                                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `string`                                 | `==`, `!=`, `@=`, `_=`, `_-=`, `!@=`, `!_=`, `!_-=`, `@=*`, `_=*`, `_-=*`, `==*`, `!=*`, `!@=*`, `!_=*`                                                                               |
+| `int`                                    | `==`, `!=`, `>`, `<`, `>=`, `<=`                                                                                                                                                      |
+| `double`                                 | `==`, `!=`, `>`, `<`, `>=`, `<=`                                                                                                                                                      |
+| `decimal`                                | `==`, `!=`, `>`, `<`, `>=`, `<=`                                                                                                                                                      |
+| `DateTime`                               | `==`, `!=`, `>`, `<`, `>=`, `<=`                                                                                                                                                      |
+| `bool`                                   | `==`, `!=`                                                                                                                                                                            |
+| `List<string>,List<int> (tipos basicos)` | `@=`, `!@=`,`<`, `<=`,`>`, `>=` Se utiliza cuando se quiere evaluar los valores de una lista, tener en cuenta que los operadores >, >=, < y <= aplican solo para el Count de la lista |
+| `Array`                                  | `@=`, `!@=` Si se quiere evaluar una lista de datos cuando se separa por el operado pipe aplica alguno de estos dos operadores, esto solo aplica solo en el filtro                    |
 
 ## Ejemplo de filtro
 
-``` C#
+```C#
 var filter = "propertyName==value,propertyAge>=20,city@=Medellín|Bogota"
-//Example response 
+//Example response
 // var cities = new List<string> { "Medellín", "Bogota" };
 //.Where(x => x.propertyName == "value" && x.propertyAge >= 20 && cities.Contains(x.city))
 ```
 
 ## Si quiero filtrar por todas las categorias Searchable
 
-``` C#
+```C#
 var filter = "valor"
 //Con esto ya se encarga de buscar ese valor con el metodo .Contains en todas las propiedades searchable
 ```
@@ -76,7 +78,7 @@ var filter = "valor"
 
 Cuando se requiere filtrar por un grupo de filtros de una propiedad, se puede hacer uso de la siguiente sintaxis:
 
-``` C#
+```C#
 var filter = "propertyName@=value1|value2|value3"
 //Example response
 //.Where(x => new List<string> { "value1", "value2", "value3" }.Contains(x.propertyName))
@@ -86,7 +88,7 @@ El resultado del filtro es una expresión lambda que se puede aplicar a una list
 
 ## Ejemplo de implementación
 
-``` C#
+```C#
 using FilterSoft;
 string filter = "propertyName==value,propertyAge>=20,city@=Medellín|Bogota";
 var lista = new List<YourClass>();
@@ -97,7 +99,7 @@ lista.Where(filter).ToList();
 
 ## Buscar un elemento en una lista de datos
 
-``` C#
+```C#
 using FilterSoft;
 string filter = "propertyName@=value1";
 //propertyName es una lista de string
@@ -109,11 +111,60 @@ lista.Where(filter).ToList();
 
 ## Buscar un valor nulo en una propiedad, se puede utilizar el operador ==null o !=null
 
-``` C#
+```C#
 using FilterSoft;
 string filter = "propertyName==null";
 var lista = new List<YourClass>();
 FilterSoft<YourClass> filterSoft = new FilterSoft<YourClass>();
 var filter = filterSoft.GetFilterExpression(filter);
+lista.Where(filter).ToList();
+```
+
+## Buscar en Objetos anidados
+
+Cuando hablamos de objetos anidados contemplamos las siguientes opciones:
+
+```C#
+class ClasePrincipal {
+	public string property {get;set;}
+	//Las siguientes opciones corresponden a los objetos anidados:
+	[Searchable]
+	public ClaseSecundaria properyObject {get;set;}
+	[Searchable]
+	public List<ClaseSecundaria> propertyListObject {get;set;}
+}
+class ClaseSecundaria {
+	[Searchable]
+	public string propertyOne {get;set;}
+	[Searchable]
+	public int propertyTwo {get;set;}
+	[Searchable]
+	public bool propertyThree {get;set;}
+	[Searchable]
+	public List<string> propertyFour {get;set;}
+}
+```
+
+De acuerdo con el ejemplo anterio, las consultas se pueden realizar de la siguiente manera:
+
+```C#
+using FilterSoft;
+string filter = "properyObject.propertyOne==Example";
+var lista = new List<YourClass>();
+FilterSoft<YourClass> filterSoft = new FilterSoft<YourClass>();
+var filter = filterSoft.GetFilterExpression(filter);
+// Esto es similar al siguiente lambda: x=> x.propertyObject?.propertyOne=='Example'
+lista.Where(filter).ToList();
+```
+
+Si se quiere buscar en una lista de objetos:
+
+```C#
+using FilterSoft;
+string filter = "propertyListObject.propertyOne==Example";
+var lista = new List<YourClass>();
+FilterSoft<YourClass> filterSoft = new FilterSoft<YourClass>();
+var filter = filterSoft.GetFilterExpression(filter);
+// Esto es similar al siguiente lambda: x=> x.propertyObject !== null & x.Any(y=> y.propertyOne=='Example')
 lista.Where(filter).ToList();
 ```
