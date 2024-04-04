@@ -1,4 +1,6 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection.Metadata;
+using System.Xml.Linq;
 
 namespace FilterSort.Helpers;
 
@@ -26,7 +28,14 @@ public class FilterCondition
     /// <exception cref="ArgumentException"></exception>
     public static BinaryExpression BinaryExpression(string propertyName, string operatorFilter, ParameterExpression parameter, List<string> values, Type typeValue)
     {
-        var property = Expression.Property(parameter, propertyName);
+        MemberExpression property = null;
+        foreach (string element in propertyName.Split("."))
+        {
+            if (property == null)
+                property = Expression.Property(parameter, element);
+            else
+                property = Expression.Property(property, element);
+        }
 
         if (values.Count > 1)
         {
@@ -38,8 +47,8 @@ public class FilterCondition
         {
             return operatorFilter switch
             {
-                "==" => Expression.Equal(property, Expression.Constant(null)),
-                _ => Expression.NotEqual(property, Expression.Constant(null)),
+                "==" => generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, Expression.Equal(property, Expression.Constant(null))),
+                _ => generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, Expression.NotEqual(property, Expression.Constant(null))),
             };
         }
 
@@ -55,43 +64,74 @@ public class FilterCondition
         {
             return operatorFilter switch
             {
-                "@=" => resolveContainsList(property, constant, typeValue, "@="),
-                "!@=" => resolveContainsList(property, constant, typeValue, "!@="),
-                _ => resolveCountList(property, constant, operatorFilter)
+                "@=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, resolveContainsList(property, constant, typeValue, "@=")),
+                "!@=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, resolveContainsList(property, constant, typeValue, "!@=")),
+                _ => generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, resolveCountList(property, constant, operatorFilter))
             };
         }
 
         return operatorFilter switch
         {
-            "==" => Expression.Equal(property, constant),
-            "!=" => Expression.NotEqual(property, constant),
-            ">" => Expression.GreaterThan(property, constant),
-            "<" => Expression.LessThan(property, constant),
-            ">=" => Expression.GreaterThanOrEqual(property, constant),
-            "<=" => Expression.LessThanOrEqual(property, constant),
-            "_=" => resolveGeneric(property, constant, "StartsWith"),
-            "!_=" => resolveGenericNegative(property, constant, "StartsWith"),
-            "_-=" => resolveGeneric(property, constant, "EndsWith"),
-            "!_-=" => resolveGenericNegative(property, constant, "EndsWith"),
-            "@=" => resolveGeneric(property, constant, "Contains"),
-            "!@=" => resolveGenericNegative(property, constant, "Contains"),
-            "@=*" => resolveGeneric(property, constant, "Contains", true),
-            "_=*" => resolveGeneric(property, constant, "StartsWith", true),
-            "_-=*" => resolveGeneric(property, constant, "EndsWith",true),
-            "==*" => resolveEqualsIgnoreCase(property, constant),
-            "!=*" => resolveGenericNegative(property, constant, "Equals", true),
-            "!@=*" => resolveGenericNegative(property, constant, "Contains", true),
-            "!_=*" => resolveGenericNegative(property, constant, "StartsWith", true),
-            "IN" => resolveInOrNotIn(property, values, typeValue, true),
-            "NOT IN" => resolveInOrNotIn(property, values, typeValue, false),
+            "==" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,Expression.Equal(property, constant)),
+            "!=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, Expression.NotEqual(property, constant)),
+            ">" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,Expression.GreaterThan(property, constant)),
+            "<" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,Expression.LessThan(property, constant)),
+            ">=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,Expression.GreaterThanOrEqual(property, constant)),
+            "<=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, Expression.LessThanOrEqual(property, constant)),
+            "_=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGeneric(property, constant, "StartsWith")),
+            "!_=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGenericNegative(property, constant, "StartsWith")),
+            "_-=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGeneric(property, constant, "EndsWith")),
+            "!_-=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGenericNegative(property, constant, "EndsWith")),
+            "@=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGeneric(property, constant, "Contains")),
+            "!@=" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGenericNegative(property, constant, "Contains")),
+            "@=*" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGeneric(property, constant, "Contains", true)),
+            "_=*" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGeneric(property, constant, "StartsWith", true)),
+            "_-=*" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGeneric(property, constant, "EndsWith",true)),
+            "==*" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveEqualsIgnoreCase(property, constant)),
+            "!=*" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGenericNegative(property, constant, "Equals", true)),
+            "!@=*" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGenericNegative(property, constant, "Contains", true)),
+            "!_=*" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveGenericNegative(property, constant, "StartsWith", true)),
+            "IN" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveInOrNotIn(property, values, typeValue, true)),
+            "NOT IN" => generateBinaryExpressionIgnoreNullInSubObject(propertyName,parameter,resolveInOrNotIn(property, values, typeValue, false)),
             _ => throw new ArgumentException("Invalid operator filter")
         };
     }
 
     /// <summary>
+    ///     Author:   Edwin Ibarra
+    ///     Create Date: 03/04/2024
+    ///     Se encarga de generar la expresion binaria para validar si antes de evaluar una propiedad, las propiedades que la preceden son diferentes de null, solo aplica para cuando estas accediendo a un subobjeto
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <param name="parameter"></param>
+    /// <param name="binaryExpressionPrincipal"></param>
+    /// <returns></returns>
+    private static BinaryExpression generateBinaryExpressionIgnoreNullInSubObject(string propertyName, ParameterExpression parameter, BinaryExpression binaryExpressionPrincipal)
+    {
+        
+        if (propertyName.Contains("."))
+        {
+            BinaryExpression binaryExpressionsReturn = null;
+            Expression lastExpression = null;
+            foreach (var propertyobj in propertyName.Split("."))
+            {
+                lastExpression = Expression.Property(lastExpression == null ? parameter : lastExpression, propertyobj);
+
+                if(binaryExpressionsReturn == null)
+                    binaryExpressionsReturn = Expression.NotEqual(lastExpression, Expression.Constant(null));
+                else
+                    binaryExpressionsReturn = Expression.AndAlso(binaryExpressionsReturn, Expression.NotEqual(lastExpression, Expression.Constant(null)));
+                return Expression.AndAlso(binaryExpressionsReturn, binaryExpressionPrincipal);
+            }
+        }
+        return binaryExpressionPrincipal;
+    }
+
+
+    /// <summary>
     ///    Author:   Edwin Ibarra
     ///    Create Date: 14/03/2024
-    ///    BinaryExpression, este metodo se encarga de generar la expresion binaria, es utilizado cuando el filtro es unico y no se establecio propiedad, en este caso se busca en todas las propiedades [Searchable] del modelo
+    ///    BinaryExpression, este metodo se encarga de generar la expresion binaria, es utilizado cuando el filtro es unico y no se establecio propiedad, en este caso se busca en todas las propiedades [Searchable] del modelo, pero solo las de primer nivel y tambien excluye las listas
     /// </summary>
     /// <param name="listProperties"></param>
     /// <param name="parameter"></param>
@@ -105,19 +145,19 @@ public class FilterCondition
         Expression constant = GetExpressionConstant("@=", values, typeof(string));
         foreach (var property in listProperties)
         {
+            Type typeProperty = typeof(T).GetProperty(property).PropertyType;
+            bool isSystemType = typeProperty.IsPrimitive || typeProperty.IsValueType || typeProperty == typeof(string) || typeProperty.Namespace.StartsWith("System");
+
             BinaryExpression expValidate = null;
-            if (typeof(T).GetProperty(property).PropertyType.Name.Contains("List"))
+            if (typeof(T).GetProperty(property).PropertyType.Name.Contains("List") || !isSystemType)
             {
                 continue;
             }
-            else
-            {
-                var propertyExp = Expression.Property(parameter, property);
-                var toStringMethod = typeof(object).GetMethod("ToString");
-                var toStringCall = Expression.Call(propertyExp, toStringMethod);
-                MethodCallExpression callExpression = Expression.Call(toStringCall, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
-                expValidate = Expression.Equal(callExpression, Expression.Constant(true));
-            }
+            var propertyExp = Expression.Property(parameter, property);
+            var toStringMethod = typeof(object).GetMethod("ToString");
+            var toStringCall = Expression.Call(propertyExp, toStringMethod);
+            MethodCallExpression callExpression = Expression.Call(toStringCall, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
+            expValidate = Expression.Equal(callExpression, Expression.Constant(true));
             if (binaryExpressionsReturn == null)
                 binaryExpressionsReturn = expValidate;
             else
@@ -125,6 +165,7 @@ public class FilterCondition
         }
         return binaryExpressionsReturn;
     }
+
 
     /// <summary>
     ///    Author:   Edwin Ibarra
@@ -220,6 +261,15 @@ public class FilterCondition
         };
         return Expression.AndAlso(notNull, binaryComparation);
     }
+
+    /// <summary>
+    ///     Author:   Edwin Ibarra
+    ///     Create Date: 03/04/2024
+    ///     Este metodo evalua si una propiedad es igual a otra e ignora los case sensitive
+    /// </summary>
+    /// <param name="propertyExp"></param>
+    /// <param name="constant"></param>
+    /// <returns></returns>
     private static BinaryExpression resolveEqualsIgnoreCase(Expression propertyExp, Expression constant)
     {
         MethodCallExpression callExpression;

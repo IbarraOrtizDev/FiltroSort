@@ -27,14 +27,14 @@ public class GenerateBinaryExpression<T>
     {
         if (string.IsNullOrWhiteSpace(filterParam)) return null;
 
-        var propertiesList = GetSearchableProperties<T>();
+        var propertiesList = GetSearchableProperties(typeof(T));
 
         var listFilters = filterParam.Split(',').ToList();
         BinaryExpression binaryExpressions = null;
 
         foreach (var filter in listFilters)
         {
-            var conditionData = new DeserializeFilterProperty<T>(filter);
+            var conditionData = new DeserializeFilterProperty(filter, typeof(T));
             BinaryExpression condition = null;
             if (string.IsNullOrEmpty(conditionData.PropertyName) && string.IsNullOrEmpty(conditionData.Operator))
             {
@@ -42,14 +42,10 @@ public class GenerateBinaryExpression<T>
             }
             else
             {
-                if (!(conditionData.Values.FirstOrDefault()?.ToLower() == "null" && conditionData.PropertyName != null)
-                    && (conditionData.PropertyName == null
-                    || (conditionData.Values == null && conditionData.Values.Count == 0)
-                    || !OperatorIsValidForType(conditionData.Operator, typeof(T).GetProperty(conditionData.PropertyName).PropertyType)
-                    || !propertiesList.Contains(conditionData.PropertyName))
-                    ) continue;
+                if (!PropertyAndValueIsAvailable(filter, typeof(T))) continue;
 
-                var property = typeof(T).GetProperty(conditionData.PropertyName);
+                var property = GetPropertyInfo(conditionData.PropertyName!, typeof(T));
+                if (property == null) continue;
                 condition = FilterCondition.BinaryExpression(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Values, property.PropertyType);
                 if (condition == null) continue;
             };
@@ -61,6 +57,63 @@ public class GenerateBinaryExpression<T>
         }
 
         return binaryExpressions;
+    }
+    /// <summary>
+    ///     Author:   Edwin Ibarra
+    ///     Create Date: 03/04/2024
+    ///     Evalua si la propiedad y el valor estan disponibles y corresponden al tipo de dato establecido
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="typeValue"></param>
+    /// <returns></returns>
+    private static bool PropertyAndValueIsAvailable(string filter, Type typeValue)
+    {
+        var propertiesList = GetSearchableProperties(typeValue);
+        if (filter.Contains("."))
+        {
+            bool found = false;
+            filter.Split('.').ToList().ForEach(x =>
+            {
+                if (propertiesList.Contains(x))
+                {
+                    propertiesList = GetSearchableProperties(typeValue.GetProperty(x).PropertyType);
+                    typeValue = typeValue.GetProperty(x).PropertyType;
+                    filter = filter.Replace(x + ".", "");
+                    found = true;
+                }
+            });
+            if (!found) return false;
+        }
+        var conditionData = new DeserializeFilterProperty(filter, typeValue);
+
+        if (!(conditionData.Values.FirstOrDefault()?.ToLower() == "null" && conditionData.PropertyName != null)
+                    && (conditionData.PropertyName == null
+                    || (conditionData.Values == null && conditionData.Values.Count == 0)
+                    || !OperatorIsValidForType(conditionData.Operator, typeValue.GetProperty(conditionData.PropertyName).PropertyType)
+                    || !propertiesList.Contains(conditionData.PropertyName))
+                    ) return false;
+        return true;
+    }
+
+    /// <summary>
+    ///     Author:   Edwin Ibarra
+    ///     Create Date: 03/04/2024
+    ///     Obtiene la informacion de la ultima propiedad de la cadena de propiedades, de acuerdo al filtro dado por el usuario
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <param name="typeValue"></param>
+    /// <returns></returns>
+    public static PropertyInfo? GetPropertyInfo(string propertyName, Type typeValue)
+    {
+        if (propertyName.Contains("."))
+        {
+            var properties = propertyName.Split('.');
+            var property = typeValue.GetProperty(properties[0]);
+            if (property == null) return null;
+            return GetPropertyInfo(propertyName.Replace(properties[0] + ".", ""), property.PropertyType);
+        }
+        PropertyInfo? propertyInfo = typeValue.GetProperty(propertyName);
+        return propertyInfo;
     }
     /// <summary>
     ///    Author:   Edwin Ibarra
@@ -156,9 +209,9 @@ public class GenerateBinaryExpression<T>
     /// <returns>
     /// Lista de propiedades que son buscables
     /// </returns>
-    public static List<string> GetSearchableProperties<T>()
+    public static List<string> GetSearchableProperties(Type typeObject)
     {
-        return typeof(T).GetProperties()
+        return typeObject.GetProperties()
             .Where(e => e.GetCustomAttribute<Searchable>(true) != null).Select(x => x.Name).ToList();
     }
 }
