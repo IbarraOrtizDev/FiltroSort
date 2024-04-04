@@ -184,7 +184,6 @@ public class FilterCondition
         {
             Type typeProperty = typeof(T).GetProperty(property).PropertyType;
 
-            BinaryExpression expValidate = null;
             if (typeof(T).GetProperty(property).PropertyType.Name.Contains("List") || !IsPrimitiveExtenssionProperty(typeProperty))
             {
                 continue;
@@ -192,8 +191,15 @@ public class FilterCondition
             var propertyExp = Expression.Property(parameter, property);
             var toStringMethod = typeof(object).GetMethod("ToString");
             var toStringCall = Expression.Call(propertyExp, toStringMethod);
+
+            var toUpperMethod = typeof(string).GetMethod("ToUpper", Type.EmptyTypes);
+            var toUpperCall = Expression.Call(toStringCall, toUpperMethod);
+
+            var constantToUpper = Expression.Call(constant, toUpperMethod);
+
             MethodCallExpression callExpression = Expression.Call(toStringCall, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
-            expValidate = Expression.Equal(callExpression, Expression.Constant(true));
+            BinaryExpression expValidate = Expression.Equal(callExpression, Expression.Constant(true));
+
             if (binaryExpressionsReturn == null)
                 binaryExpressionsReturn = expValidate;
             else
@@ -202,6 +208,13 @@ public class FilterCondition
         return binaryExpressionsReturn;
     }
 
+    /// <summary>
+    /// Autor:  Edwin Ibarra
+    /// Create Date: 04/04/2024
+    /// Evalua si el tipo de dato es propio del sistema 
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
     public static bool IsPrimitiveExtenssionProperty(Type type)
     {
         return type.IsPrimitive || type.IsValueType || type == typeof(string) || type.Namespace.StartsWith("System");
@@ -237,8 +250,8 @@ public class FilterCondition
             var constantToUpper = Expression.Call(constant, toUpperMethod);
             if(method == "Equals")
             {
-                var equalsMethod = typeof(string).GetMethod(method, new[] { typeof(string) });
-                callExpression = Expression.Call(toUpperCall, equalsMethod, constantToUpper);
+                //var equalsMethod = typeof(string).GetMethod(method, new[] { typeof(string) });
+                callExpression = constantToUpper;
             }else
                 callExpression = Expression.Call(toUpperCall, method, null, constantToUpper);
         }
