@@ -27,7 +27,7 @@ public class FilterCondition
     /// Retorna la expresion binaria
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
-    public static BinaryExpression BinaryExpression(string propertyName, string operatorFilter, ParameterExpression parameter, List<string> values, Type typeValue, Type typeValuePrincipal, MemberExpression property = null)
+    public static BinaryExpression BinaryExpression(string propertyName, string operatorFilter, ParameterExpression parameter, string value, Type typeValue, Type typeValuePrincipal, MemberExpression property = null)
     {
         if(property == null && !(propertyName.Contains(".") && typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.Name.Contains("List")) )
         {
@@ -40,13 +40,8 @@ public class FilterCondition
             }
         }
 
-        if (values.Count > 1)
-        {
-            operatorFilter = operatorFilter == "!@=" ? "NOT IN" : "IN";
-        }
-
         // If the value is null
-        if (values[0].ToLower() == "null")
+        if (value.ToLower() == "null")
         {
             return operatorFilter switch
             {
@@ -55,9 +50,9 @@ public class FilterCondition
             };
         }
 
-        Expression constant = GetExpressionConstant(operatorFilter, values, typeValue);
+        Expression constant = GetExpressionConstant(operatorFilter, value, typeValue);
 
-        if(Nullable.GetUnderlyingType(typeValue) != null && !operatorFilter.Contains("IN"))
+        if(Nullable.GetUnderlyingType(typeValue) != null)
             constant = Expression.Convert(constant, typeValue);
 
         if (constant == null) return null;
@@ -65,8 +60,9 @@ public class FilterCondition
         if (propertyName.Contains(".") && typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.Name.Contains("List"))
         {
             var propiedadListaObjetos = Expression.Property(parameter, propertyName.Split(".")[0]);
-            var removeOther = propertyName.Replace(propertyName.Split(".")[0] + ".", "");
-            LambdaExpression lambda = CreateAnyExpression(typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.GenericTypeArguments[0], removeOther, operatorFilter, values);
+            var removeElementParent = propertyName.Replace(propertyName.Split(".")[0] + ".", "");
+
+            LambdaExpression lambda = CreateAnyExpression(typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.GenericTypeArguments[0], removeElementParent, operatorFilter, value);
             var anyMethod = Expression.Call(typeof(Enumerable), "Any", new[] { typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.GetGenericArguments()[0] }, propiedadListaObjetos, lambda);
             return generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, Expression.Equal(anyMethod, Expression.Constant(true)));
         }
@@ -81,7 +77,7 @@ public class FilterCondition
                 _ => generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, resolveCountList(property, constant, operatorFilter))
             };
         }
-        return generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, EvaluateTypePrimitive(property, constant, operatorFilter, values, typeValue));
+        return generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, EvaluateTypePrimitive(property, constant, operatorFilter));
     }
 
     /// <summary>
@@ -94,18 +90,18 @@ public class FilterCondition
     /// <param name="operatorFilter"></param>
     /// <param name="values"></param>
     /// <returns></returns>
-    private static LambdaExpression CreateAnyExpression(Type typeProperty, string propertyName, string operatorFilter, List<string> values )
+    private static LambdaExpression CreateAnyExpression(Type typeProperty, string propertyName, string operatorFilter, string value )
     {
         var parameterY = Expression.Parameter(typeProperty, "y");
         MemberExpression propertyY = Expression.Property(parameterY, propertyName);
 
-        var aaa= BinaryExpression(propertyName, operatorFilter, parameterY, values, typeProperty.GetProperty(propertyName).PropertyType, typeProperty, propertyY);
+        var aaa= BinaryExpression(propertyName, operatorFilter, parameterY, value, typeProperty.GetProperty(propertyName).PropertyType, typeProperty, propertyY);
         var lambda = Expression.Lambda(aaa, parameterY);
         return lambda;
     }
 
 
-    private static BinaryExpression EvaluateTypePrimitive(Expression property, Expression constant, string operatorFilter, List<string> values, Type typeValue)
+    private static BinaryExpression EvaluateTypePrimitive(Expression property, Expression constant, string operatorFilter)
     {
         return operatorFilter switch
         {
@@ -128,8 +124,6 @@ public class FilterCondition
             "!=*" => resolveGenericNegative(property, constant, "Equals", true),
             "!@=*" => resolveGenericNegative(property, constant, "Contains", true),
             "!_=*" => resolveGenericNegative(property, constant, "StartsWith", true),
-            "IN" => resolveInOrNotIn(property, values, typeValue, true),
-            "NOT IN" => resolveInOrNotIn(property, values, typeValue, false),
             _ => throw new ArgumentException("Invalid operator filter")
         };
     }
@@ -176,10 +170,10 @@ public class FilterCondition
     /// <returns>
     /// Retorna la expresion binaria
     /// </returns>
-    public static BinaryExpression BinaryExpression<T>(List<string> listProperties, ParameterExpression parameter, List<string> values)
+    public static BinaryExpression BinaryExpression<T>(List<string> listProperties, ParameterExpression parameter, string value)
     {
         BinaryExpression binaryExpressionsReturn = null;
-        Expression constant = GetExpressionConstant("@=", values, typeof(string));
+        Expression constant = GetExpressionConstant("@=", value, typeof(string));
         foreach (var property in listProperties)
         {
             Type typeProperty = typeof(T).GetProperty(property).PropertyType;
@@ -388,15 +382,15 @@ public class FilterCondition
     /// <param name="typeValue"></param>
     /// <param name="isIn"></param>
     /// <returns></returns>
-    private static BinaryExpression resolveInOrNotIn(Expression property, List<string> values, Type typeValue, bool isIn)
-    {
-        MethodCallExpression call = resolveContainsMethod(property, values, typeValue);
+    //private static BinaryExpression resolveInOrNotIn(Expression property, List<string> values, Type typeValue, bool isIn)
+    //{
+    //    MethodCallExpression call = resolveContainsMethod(property, values, typeValue);
 
-        if (isIn)
-            return Expression.Equal(call, Expression.Constant(true));
-        var notStartWith = Expression.Not(call);
-        return Expression.NotEqual(notStartWith, Expression.Constant(true));
-    }
+    //    if (isIn)
+    //        return Expression.Equal(call, Expression.Constant(true));
+    //    var notStartWith = Expression.Not(call);
+    //    return Expression.NotEqual(notStartWith, Expression.Constant(true));
+    //}
 
     /// <summary>
     ///    Author:   Edwin Ibarra
@@ -459,73 +453,26 @@ public class FilterCondition
     /// <returns>
     /// Expression
     /// </returns>
-    public static Expression GetExpressionConstant(string operatorFilter, List<string> values, Type typeValue)
+    public static Expression GetExpressionConstant(string operatorFilter, string value, Type typeValue)
     {
         Expression constant = null;
         try
         {
             typeValue = typeValueNotNull(typeValue);
-            if (operatorFilter == "IN" || operatorFilter == "NOT IN")
+            if (typeValue == typeof(string))
             {
-                switch (typeValue)
-                {
-                    case Type t when t == typeof(int):
-                        List<int> intList = values.Select(x => Convert.ToInt32(x)).ToList();
-                        constant = Expression.Constant(intList, typeof(List<int>));
-                        break;
-                    case Type t when t == typeof(decimal):
-                        List<decimal> decimalList = values.Select(x => Convert.ToDecimal(x)).ToList();
-                        constant = Expression.Constant(decimalList, typeof(List<decimal>));
-                        break;
-                    case Type t when t == typeof(double):
-                        List<double> doubleList = values.Select(x => Convert.ToDouble(x)).ToList();
-                        constant = Expression.Constant(doubleList, typeof(List<double>));
-                        break;
-                    case Type t when t == typeof(float):
-                        List<float> floatList = values.Select(x => Convert.ToSingle(x)).ToList();
-                        constant = Expression.Constant(floatList, typeof(List<float>));
-                        break;
-                    case Type t when t == typeof(long):
-                        List<long> longList = values.Select(x => Convert.ToInt64(x)).ToList();
-                        constant = Expression.Constant(longList, typeof(List<long>));
-                        break;
-                    case Type t when t == typeof(short):
-                        List<short> shortList = values.Select(x => Convert.ToInt16(x)).ToList();
-                        constant = Expression.Constant(shortList, typeof(List<short>));
-                        break;
-                    case Type t when t == typeof(byte):
-                        List<byte> byteList = values.Select(x => Convert.ToByte(x)).ToList();
-                        constant = Expression.Constant(byteList, typeof(List<byte>));
-                        break;
-                    case Type t when t == typeof(bool):
-                        List<bool> boolList = values.Select(x => Convert.ToBoolean(x)).ToList();
-                        constant = Expression.Constant(boolList, typeof(List<bool>));
-                        break;
-                    case Type t when t == typeof(DateTime):
-                        List<DateTime> dateTimeList = values.Select(x => Convert.ToDateTime(x)).ToList();
-                        constant = Expression.Constant(dateTimeList, typeof(List<DateTime>));
-                        break;
-                    default:
-                        constant = Expression.Constant(values, typeof(List<string>));
-                        break;
-                }
+                constant = Expression.Constant(value);
+            }
+            else if (typeValue.Name.Contains("List"))
+            {
+                if (operatorFilter == "@=" || operatorFilter == "!@=")
+                    constant = Expression.Constant(Convert.ChangeType(value, GetTypeList(typeValue)));
+                else
+                    constant = Expression.Constant(Int32.Parse(value));
             }
             else
             {
-                if (typeValue == typeof(string))
-                {
-                    constant = Expression.Constant(values[0]);
-                }else if (typeValue.Name.Contains("List"))
-                {
-                    if(operatorFilter == "@=" || operatorFilter == "!@=")
-                        constant = Expression.Constant(Convert.ChangeType(values[0], GetTypeList(typeValue)));
-                    else
-                        constant = Expression.Constant(Int32.Parse(values[0]));
-                }
-                else
-                {
-                    constant = Expression.Constant(Convert.ChangeType(values[0], typeValue));
-                }
+                constant = Expression.Constant(Convert.ChangeType(value, typeValue));
             }
         }
         catch (Exception)

@@ -38,7 +38,7 @@ public class GenerateBinaryExpression<T>
             BinaryExpression condition = null;
             if (string.IsNullOrEmpty(conditionData.PropertyName) && string.IsNullOrEmpty(conditionData.Operator))
             {
-                condition = FilterCondition.BinaryExpression<T>(propertiesList, parameter, new List<string>() { filter });
+                condition = FilterCondition.BinaryExpression<T>(propertiesList, parameter, filter);
             }
             else
             {
@@ -46,7 +46,8 @@ public class GenerateBinaryExpression<T>
 
                 var property = GetPropertyInfo(conditionData.PropertyName!, typeof(T));
                 if (property == null) continue;
-                condition = FilterCondition.BinaryExpression(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Values, property.PropertyType, typeof(T));
+
+                condition = BinaryExpressionByProperty(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Values, property.PropertyType, typeof(T));
                 if (condition == null) continue;
             };
 
@@ -56,6 +57,29 @@ public class GenerateBinaryExpression<T>
                 binaryExpressions = Expression.AndAlso(binaryExpressions, condition);
         }
 
+        return binaryExpressions;
+    }
+
+    /// <summary>
+    ///     Author:   Edwin Ibarra
+    ///     Create Date: 05/04/2024
+    ///     En un paso anterior cuando se recibia un filtro con una propiedad que incluyera un elemento "|", este generaba una expresion lambda para evaluar si el valor de la propiedad estaba contenido en la lista de valores recibida, ahora se ha modificado para que se pueda evaluar cada valor de la lista de valores recibida con el valor de la propiedad y por cada valor se genera una expresion lambda, para luego unirlas con un OR y de esta manera poder utilizar el operador correspondiente al filtro
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <param name="typeValue"></param>
+    /// <returns></returns>
+    private static BinaryExpression BinaryExpressionByProperty(string propertyName, string operatorFilter, ParameterExpression parameter, List<string> values, Type typeValue, Type typeValuePrincipal)
+    {
+        BinaryExpression binaryExpressions = null;
+
+        foreach (var value in values)
+        {
+            var evaluation = FilterCondition.BinaryExpression(propertyName, operatorFilter, parameter, value, typeValue, typeValuePrincipal);
+            if(binaryExpressions == null)
+                binaryExpressions = evaluation;
+            else
+                binaryExpressions = Expression.OrElse(binaryExpressions, evaluation);
+        }
         return binaryExpressions;
     }
     /// <summary>

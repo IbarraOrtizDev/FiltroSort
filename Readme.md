@@ -56,12 +56,11 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 | `DateTime`                               | `==`, `!=`, `>`, `<`, `>=`, `<=`                                                                                                                                                      |
 | `bool`                                   | `==`, `!=`                                                                                                                                                                            |
 | `List<string>,List<int> (tipos basicos)` | `@=`, `!@=`,`<`, `<=`,`>`, `>=` Se utiliza cuando se quiere evaluar los valores de una lista, tener en cuenta que los operadores >, >=, < y <= aplican solo para el Count de la lista |
-| `Array`                                  | `@=`, `!@=` Si se quiere evaluar una lista de datos cuando se separa por el operado pipe aplica alguno de estos dos operadores, esto solo aplica solo en el filtro                    |
 
 ## Ejemplo de filtro
 
 ```C#
-var filter = "propertyName==value,propertyAge>=20,city@=Medellín|Bogota"
+var filter = "propertyName==value,propertyAge>=20,city==Medellín|Bogota"
 //Example response
 // var cities = new List<string> { "Medellín", "Bogota" };
 //.Where(x => x.propertyName == "value" && x.propertyAge >= 20 && cities.Contains(x.city))
@@ -79,9 +78,10 @@ var filter = "valor"
 Cuando se requiere filtrar por un grupo de filtros de una propiedad, se puede hacer uso de la siguiente sintaxis:
 
 ```C#
-var filter = "propertyName@=value1|value2|value3"
+var filter = "propertyName==value1|value2|value3"
+//En este caso se busca que la propiedad propertyName sea igual a value1, value2 o value3 y se puede extender a n valores, ademas tener en cuenta que el operador | es un OR y no un AND y adicionalmente se pueden utilizar los operadores correspondientes a los tipos de datos.
 //Example response
-//.Where(x => new List<string> { "value1", "value2", "value3" }.Contains(x.propertyName))
+//.Where(x => (x.propertyName == "value1" || x.propertyName == "value2" || x.propertyName == "value3"))
 ```
 
 El resultado del filtro es una expresión lambda que se puede aplicar a una lista de objetos.
