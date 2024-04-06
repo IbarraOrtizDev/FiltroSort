@@ -95,8 +95,8 @@ public class FilterCondition
         var parameterY = Expression.Parameter(typeProperty, "y");
         MemberExpression propertyY = Expression.Property(parameterY, propertyName);
 
-        var aaa= BinaryExpression(propertyName, operatorFilter, parameterY, value, typeProperty.GetProperty(propertyName).PropertyType, typeProperty, propertyY);
-        var lambda = Expression.Lambda(aaa, parameterY);
+        var subQuery= BinaryExpression(propertyName, operatorFilter, parameterY, value, typeProperty.GetProperty(propertyName).PropertyType, typeProperty, propertyY);
+        var lambda = Expression.Lambda(subQuery, parameterY);
         return lambda;
     }
 
