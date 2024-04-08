@@ -66,7 +66,11 @@ public class GenerateBinaryExpression<T>
     ///     En un paso anterior cuando se recibia un filtro con una propiedad que incluyera un elemento "|", este generaba una expresion lambda para evaluar si el valor de la propiedad estaba contenido en la lista de valores recibida, ahora se ha modificado para que se pueda evaluar cada valor de la lista de valores recibida con el valor de la propiedad y por cada valor se genera una expresion lambda, para luego unirlas con un OR y de esta manera poder utilizar el operador correspondiente al filtro
     /// </summary>
     /// <param name="propertyName"></param>
+    /// <param name="operatorFilter"></param>
+    /// <param name="parameter"></param>
+    /// <param name="values"></param>
     /// <param name="typeValue"></param>
+    /// <param name="typeValuePrincipal"></param>
     /// <returns></returns>
     private static BinaryExpression BinaryExpressionByProperty(string propertyName, string operatorFilter, ParameterExpression parameter, List<string> values, Type typeValue, Type typeValuePrincipal)
     {
@@ -238,7 +242,7 @@ public class GenerateBinaryExpression<T>
     ///    Create Date: 14/03/2024
     ///    Lista las propiedades que son buscables
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <param name="typeObject"></param>
     /// <returns>
     /// Lista de propiedades que son buscables
     /// </returns>

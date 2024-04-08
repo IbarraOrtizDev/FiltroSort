@@ -21,8 +21,9 @@ public class FilterCondition
     /// <param name="operatorFilter"></param>
     /// <param name="parameter"></param>
     /// <param name="value"></param>
-    /// <param name="values"></param>
     /// <param name="typeValue"></param>
+    /// <param name="typeValuePrincipal"></param>
+    /// <param name="property"></param>
     /// <returns>
     /// Retorna la expresion binaria
     /// </returns>
@@ -88,7 +89,7 @@ public class FilterCondition
     /// <param name="typeProperty"></param>
     /// <param name="propertyName"></param>
     /// <param name="operatorFilter"></param>
-    /// <param name="values"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
     private static LambdaExpression CreateAnyExpression(Type typeProperty, string propertyName, string operatorFilter, string value )
     {
@@ -100,7 +101,16 @@ public class FilterCondition
         return lambda;
     }
 
-
+    /// <summary>
+    /// Author:   Edwin Ibarra
+    /// Create Date: 04/04/2024
+    /// Evalua condiciones cuando la propiedad es primitiva
+    /// </summary>
+    /// <param name="property"></param>
+    /// <param name="constant"></param>
+    /// <param name="operatorFilter"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     private static BinaryExpression EvaluateTypePrimitive(Expression property, Expression constant, string operatorFilter)
     {
         return operatorFilter switch
@@ -220,7 +230,7 @@ public class FilterCondition
     ///    Create Date: 14/03/2024
     ///    Description: Se encarga de generar el BinaryExpression, el metodo tipo de metodo a utilizar se recibe por parametro y de acuerdo al parametro ignoreCase se determina si lo ignora o no
     /// </summary>
-    /// <param name="property"></param>
+    /// <param name="propertyExp"></param>
     /// <param name="constant"></param>
     /// <param name="method"></param>
     /// <param name="ignoreCase"></param>
@@ -338,7 +348,7 @@ public class FilterCondition
     ///    Create Date: 14/03/2024
     ///    Description: Se encarga de generar el BinaryExpression, el metodo tipo de metodo a utilizar se recibe por parametro y de acuerdo al parametro ignoreCase se determina si lo ignora o no, en este caso siempre retorna negando el metodo
     /// </summary>
-    /// <param name="property"></param>
+    /// <param name="propertyExp"></param>
     /// <param name="constant"></param>
     /// <param name="method"></param>
     /// <param name="ignoreCase"></param>
@@ -370,27 +380,6 @@ public class FilterCondition
         var negativeExpression = Expression.Not(callExpression);
         return Expression.Equal(negativeExpression, Expression.Constant(true));
     }
-
-
-    /// <summary>
-    ///    Author:   Edwin Ibarra
-    ///    Create Date: 14/03/2024
-    ///    resolveInOrNotIn, este metodo se encarga de generar la expresion binaria donde evalua si el valor esta en la lista de valores, de acuerdo al parametro isIn, valida si el valor esta en la lista de valores o no
-    /// </summary>
-    /// <param name="property"></param>
-    /// <param name="values"></param>
-    /// <param name="typeValue"></param>
-    /// <param name="isIn"></param>
-    /// <returns></returns>
-    //private static BinaryExpression resolveInOrNotIn(Expression property, List<string> values, Type typeValue, bool isIn)
-    //{
-    //    MethodCallExpression call = resolveContainsMethod(property, values, typeValue);
-
-    //    if (isIn)
-    //        return Expression.Equal(call, Expression.Constant(true));
-    //    var notStartWith = Expression.Not(call);
-    //    return Expression.NotEqual(notStartWith, Expression.Constant(true));
-    //}
 
     /// <summary>
     ///    Author:   Edwin Ibarra
@@ -448,7 +437,6 @@ public class FilterCondition
     /// </summary>
     /// <param name="operatorFilter"></param>
     /// <param name="value"></param>
-    /// <param name="values"></param>
     /// <param name="typeValue"></param>
     /// <returns>
     /// Expression
