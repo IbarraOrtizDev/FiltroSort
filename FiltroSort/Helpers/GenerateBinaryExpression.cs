@@ -25,7 +25,11 @@ public class GenerateBinaryExpression<T>
     /// </returns>
     public static BinaryExpression GetFilterExpressionGenerator(ParameterExpression parameter, string filterParam)
     {
+        bool isOr = false;
         if (string.IsNullOrWhiteSpace(filterParam)) return null;
+
+        if (filterParam.StartsWith("|"))
+            isOr = true;
 
         var propertiesList = GetSearchableProperties(typeof(T));
 
@@ -54,7 +58,7 @@ public class GenerateBinaryExpression<T>
             if (binaryExpressions == null)
                 binaryExpressions = condition;
             else
-                binaryExpressions = Expression.AndAlso(binaryExpressions, condition);
+                binaryExpressions = isOr ? Expression.OrElse(binaryExpressions, condition) : Expression.AndAlso(binaryExpressions, condition);
         }
 
         return binaryExpressions;
