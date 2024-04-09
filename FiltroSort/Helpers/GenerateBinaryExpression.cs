@@ -25,9 +25,8 @@ public class GenerateBinaryExpression<T>
     /// </returns>
     public static BinaryExpression GetFilterExpressionGenerator(ParameterExpression parameter, string filterParam)
     {
-        bool isOr = false;
         if (string.IsNullOrWhiteSpace(filterParam)) return null;
-
+        bool isOr = false;
         if (filterParam.StartsWith("|"))
             isOr = true;
 
