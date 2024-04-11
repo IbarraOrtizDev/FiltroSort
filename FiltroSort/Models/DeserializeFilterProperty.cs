@@ -11,7 +11,7 @@ public class DeserializeFilterProperty
     public string? PropertyName { get; set; }
     public List<string> Values { get; set; } = new List<string>();
     public string? Operator { get; set; }
-    public DeserializeFilterProperty(string filterParamUnique, Type type)
+    public DeserializeFilterProperty(string filterParamUnique, Type type, bool validOperator = true)
     {
         var listOperators = new List<string> { "!_=*", "!@=*", "_-=*", "!_-=", "_-=", "!@=", "!_=", "@=*", "_=*", "==*", "!=*", "==", "!=", ">=", "<=", "@=", "_=", ">", "<" };
 
@@ -26,7 +26,7 @@ public class DeserializeFilterProperty
         }
         if (!string.IsNullOrEmpty(Operator))
         {
-            if (GenerateBinaryExpression<bool>.GetPropertyInfo(filterParamUnique.Split(Operator)[0], type) == null)
+            if (validOperator && GenerateBinaryExpression<bool>.GetPropertyInfo(filterParamUnique.Split(Operator)[0], type) == null)
                 return;
             PropertyName = filterParamUnique.Split(Operator)[0];
             var valor = filterParamUnique.Split(Operator)[1];
