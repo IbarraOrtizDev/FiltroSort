@@ -37,6 +37,7 @@ public class GenerateBinaryExpression<T>
 
         foreach (var filter in listFilters)
         {
+            if (string.IsNullOrEmpty(filter)) continue;
             var conditionData = new DeserializeFilterProperty(filter, typeof(T));
             BinaryExpression condition = null;
             if (string.IsNullOrEmpty(conditionData.PropertyName) && string.IsNullOrEmpty(conditionData.Operator))

@@ -51,13 +51,6 @@ public class FilterCondition
             };
         }
 
-        Expression constant = GetExpressionConstant(operatorFilter, value, typeValue);
-
-        if(Nullable.GetUnderlyingType(typeValue) != null)
-            constant = Expression.Convert(constant, typeValue);
-
-        if (constant == null) return null;
-
         if (propertyName.Contains(".") && typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.Name.Contains("List"))
         {
             var propiedadListaObjetos = Expression.Property(parameter, propertyName.Split(".")[0]);
@@ -67,6 +60,13 @@ public class FilterCondition
             var anyMethod = Expression.Call(typeof(Enumerable), "Any", new[] { typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.GetGenericArguments()[0] }, propiedadListaObjetos, lambda);
             return generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, Expression.Equal(anyMethod, Expression.Constant(true)));
         }
+
+        Expression constant = GetExpressionConstant(operatorFilter, value, typeValue);
+
+        if (Nullable.GetUnderlyingType(typeValue) != null)
+            constant = Expression.Convert(constant, typeValue);
+
+        if (constant == null) return null;
 
         //Evalua si la propiedad es una lista, si es asi, se evalua si el valor esta en la lista o no o si la cantidad de elementos es mayor o menor a un valor
         if (typeValue.Name.Contains("List"))
@@ -93,10 +93,11 @@ public class FilterCondition
     /// <returns></returns>
     private static LambdaExpression CreateAnyExpression(Type typeProperty, string propertyName, string operatorFilter, string value )
     {
+        string propertyNameLeft = propertyName.Split(".")[0];
         var parameterY = Expression.Parameter(typeProperty, "y");
-        MemberExpression propertyY = Expression.Property(parameterY, propertyName);
+        MemberExpression propertyY = Expression.Property(parameterY, propertyNameLeft);
 
-        var subQuery= BinaryExpression(propertyName, operatorFilter, parameterY, value, typeProperty.GetProperty(propertyName).PropertyType, typeProperty, propertyY);
+        var subQuery= BinaryExpression(propertyName, operatorFilter, parameterY, value, typeProperty.GetProperty(propertyNameLeft).PropertyType, typeProperty, propertyY);
         var lambda = Expression.Lambda(subQuery, parameterY);
         return lambda;
     }
@@ -451,6 +452,10 @@ public class FilterCondition
             {
                 constant = Expression.Constant(value);
             }
+            else if (IsNumericType(typeValue))
+            {
+                constant = Expression.Constant(Convert.ChangeType(value.Replace(".", ","), typeValue));
+            }
             else if (typeValue.Name.Contains("List"))
             {
                 if (operatorFilter == "@=" || operatorFilter == "!@=")
@@ -516,6 +521,34 @@ public class FilterCondition
                 break;
         }
         return call;
+    }
+
+    /// <summary>
+    /// Author:   Edwin Ibarra
+    /// Date: 10/04/2024
+    /// Valida si un tipo es númerico, se debe hacer esta validación porque los números que llegan con valor decimal con "." se debe cambiar el "." por ","
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static bool IsNumericType(Type type)
+    {
+        switch (Type.GetTypeCode(type))
+        {
+            case TypeCode.Byte:
+            case TypeCode.Decimal:
+            case TypeCode.Double:
+            case TypeCode.Int16:
+            case TypeCode.Int32:
+            case TypeCode.Int64:
+            case TypeCode.SByte:
+            case TypeCode.Single:
+            case TypeCode.UInt16:
+            case TypeCode.UInt32:
+            case TypeCode.UInt64:
+                return true;
+            default:
+                return false;
+        }
     }
 
     /// <summary>
