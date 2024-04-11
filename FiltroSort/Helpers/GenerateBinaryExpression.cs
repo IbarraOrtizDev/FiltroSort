@@ -235,6 +235,7 @@ public class GenerateBinaryExpression<T>
                 "<" => true,
                 ">=" => true,
                 "<=" => true,
+                "==" => true,
                 _ => false
             };
         }

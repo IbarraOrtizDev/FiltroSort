@@ -315,6 +315,9 @@ public class FilterCondition
             case "<=":
                 binaryComparation = Expression.LessThanOrEqual(countProperty, constant);
                 break;
+            case "==":
+                binaryComparation = Expression.Equal(countProperty, constant);
+                break;
             default:
                 throw new ArgumentException("Invalid operator filter");
         };
@@ -452,7 +455,7 @@ public class FilterCondition
             {
                 constant = Expression.Constant(value);
             }
-            else if (IsNumericType(typeValue))
+            else if (IsNumericDecimalType(typeValue))
             {
                 constant = Expression.Constant(Convert.ChangeType(value.Replace(".", ","), typeValue));
             }
@@ -530,21 +533,12 @@ public class FilterCondition
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static bool IsNumericType(Type type)
+    public static bool IsNumericDecimalType(Type type)
     {
         switch (Type.GetTypeCode(type))
         {
-            case TypeCode.Byte:
             case TypeCode.Decimal:
             case TypeCode.Double:
-            case TypeCode.Int16:
-            case TypeCode.Int32:
-            case TypeCode.Int64:
-            case TypeCode.SByte:
-            case TypeCode.Single:
-            case TypeCode.UInt16:
-            case TypeCode.UInt32:
-            case TypeCode.UInt64:
                 return true;
             default:
                 return false;

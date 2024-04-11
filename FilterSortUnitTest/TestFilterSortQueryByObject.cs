@@ -82,5 +82,35 @@ namespace FilterSortUnitTest
             //assert
             Assert.AreEqual(dataCount, data.Count);
         }
+
+        [Test]
+        public void ValidateFilterDataByObjectCountEqualListString()
+        {
+            //arrange
+            FilterSoftModel filter = new FilterSoftModel();
+            filter.Filter = "propiedadObjeto.propiedadListaString==2";
+            //act
+            FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
+            var filt = filterSort.GetFilterExpression();
+            var data = _data.AsQueryable().Where(filt).ToList();
+            var dataCount = _data.Where(x => x.propiedadObjeto?.propiedadListaString?.Count()==2).Count();
+            //assert
+            Assert.AreEqual(dataCount, data.Count);
+        }
+
+        [Test]
+        public void ValidateFilterDataByObjectCountEqualOrListString()
+        {
+            //arrange
+            FilterSoftModel filter = new FilterSoftModel();
+            filter.Filter = "propiedadObjeto.propiedadListaString==2|null";
+            //act
+            FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
+            var filt = filterSort.GetFilterExpression();
+            var data = _data.AsQueryable().Where(filt).ToList();
+            var dataCount = _data.Where(x => x.propiedadObjeto?.propiedadListaString?.Count() == 2 || (x.propiedadObjeto != null && x.propiedadObjeto.propiedadListaString == null)).Count();
+            //assert
+            Assert.AreEqual(dataCount, data.Count);
+        }
     }
 }
