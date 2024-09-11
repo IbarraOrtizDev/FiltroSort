@@ -53,7 +53,7 @@
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadString<=Test18";
+            filter.Filter = "propiedadString<=7";
 
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
@@ -61,8 +61,9 @@
             //assert
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
+            var dataCount = _data.Where(x => x.propiedadString.Length <= 7).ToList();
 
-            Assert.AreEqual(_data.Count, data.Count);
+            Assert.AreEqual(dataCount.Count, data.Count);
         }
 
         [Test]

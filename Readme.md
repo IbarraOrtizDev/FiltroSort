@@ -38,6 +38,8 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 
 ## Nota :
 
+filter=Alex
+
 1. Si el operador no es valido y solo se tiene una propiedad filtrable en el queryparam, la sección del filtro sera tomada como un valor a buscar en todas las propiedades [Searchable], de lo contrario sera ignorada.
 2. Si el tipo de dato del filtro no corresponde al tipo de dato de la propiedad, este sera ignorado.
 3. Si la clave valor que se pase en el filtro no tiene valor, este sera ignorado.
@@ -49,7 +51,7 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 
 | Type                                     | Operator                                                                                                                                                                              |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `string`                                 | `==`, `!=`, `@=`, `_=`, `_-=`, `!@=`, `!_=`, `!_-=`, `@=*`, `_=*`, `_-=*`, `==*`, `!=*`, `!@=*`, `!_=*`                                                                               |
+| `string`                                 | `==`, `>`, `<=`, `>`, `>=`, `!=`, `@=`, `_=`, `_-=`, `!@=`, `!_=`, `!_-=`, `@=*`, `_=*`, `_-=*`, `==*`, `!=*`, `!@=*`, `!_=*` Los operadores [`>`, `<=`, `>`, `>=`] permiten evaluar la longitud de un texto|
 | `int`                                    | `==`, `!=`, `>`, `<`, `>=`, `<=`                                                                                                                                                      |
 | `double`                                 | `==`, `!=`, `>`, `<`, `>=`, `<=`                                                                                                                                                      |
 | `decimal`                                | `==`, `!=`, `>`, `<`, `>=`, `<=`                                                                                                                                                      |
@@ -165,6 +167,17 @@ string filter = "propertyListObject.propertyOne==Example";
 var lista = new List<YourClass>();
 FilterSoft<YourClass> filterSoft = new FilterSoft<YourClass>();
 var filter = filterSoft.GetFilterExpression(filter);
-// Esto es similar al siguiente lambda: x=> x.propertyObject !== null & x.Any(y=> y.propertyOne=='Example')
+// Esto es similar al siguiente lambda: x=> x.propertyObject !== null && x.Any(y=> y.propertyOne=='Example'
+lista.Where(filter).ToList();
+```
+
+Evaluar la longitud de un texto
+```C#
+using FilterSoft;
+string filter = "propertyString>=5";
+var lista = new List<YourClass>();
+FilterSoft<YourClass> filterSoft = new FilterSoft<YourClass>();
+var filter = filterSoft.GetFilterExpression(filter);
+// Esto es similar al siguiente lambda: x=> x.propertyString !== null && x.propertyString >= 5
 lista.Where(filter).ToList();
 ```

@@ -46,7 +46,7 @@ public class GenerateBinaryExpression<T>
             }
             else
             {
-                if (!PropertyAndValueIsAvailable(filter, typeof(T))) continue;
+                if (!PropertyAndValueIsAvailable(filter, typeof(T), conditionData.Operator??"")) continue;
 
                 var property = GetPropertyInfo(conditionData.PropertyName!, typeof(T));
                 if (property == null) continue;
@@ -98,18 +98,18 @@ public class GenerateBinaryExpression<T>
     /// <param name="filter"></param>
     /// <param name="typeValue"></param>
     /// <returns></returns>
-    private static bool PropertyAndValueIsAvailable(string filter, Type typeValue)
+    private static bool PropertyAndValueIsAvailable(string filter, Type typeValue, string operatorFilter = "")
     {
         var propertiesList = GetSearchableProperties(typeValue);
-        if (filter.Contains("."))
+        if (!string.IsNullOrEmpty(operatorFilter) && filter.Split(operatorFilter)[0].Contains("."))
         {
             bool found = false;
-            filter.Split('.').ToList().ForEach(x =>
+            filter.Split(operatorFilter)[0].Split('.').ToList().ForEach(x =>
             {
-                if (propertiesList.Contains(x))
+                if (propertiesList.Contains(x) && !filter.Contains(x + operatorFilter))
                 {
                     propertiesList = GetSearchableProperties(typeValue.GetProperty(x).PropertyType);
-                    if(typeValue.GetProperty(x).PropertyType.Name.Contains("List") && !FilterCondition.IsPrimitiveExtenssionProperty(typeValue.GetProperty(x).PropertyType.GetGenericArguments()[0]))
+                    if (typeValue.GetProperty(x).PropertyType.Name.Contains("List") && !FilterCondition.IsPrimitiveExtenssionProperty(typeValue.GetProperty(x).PropertyType.GetGenericArguments()[0]))
                     {
                         typeValue = typeValue.GetProperty(x).PropertyType.GetGenericArguments()[0];
                     }
@@ -173,6 +173,10 @@ public class GenerateBinaryExpression<T>
         {
             return operatorFilter switch
             {
+                ">" => true,
+                ">=" => true,
+                "<" => true,
+                "<=" => true,
                 "==" => true,
                 "!=" => true,
                 "@=" => true,

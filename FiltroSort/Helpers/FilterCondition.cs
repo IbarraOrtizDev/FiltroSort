@@ -78,6 +78,9 @@ public class FilterCondition
                 _ => generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, resolveCountList(property, constant, operatorFilter))
             };
         }
+        if(typeValue == typeof(string)  && (operatorFilter.StartsWith("<") || operatorFilter.StartsWith(">")))
+            return generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, EvaluateLengthText(property, constant, operatorFilter));
+
         return generateBinaryExpressionIgnoreNullInSubObject(propertyName, parameter, EvaluateTypePrimitive(property, constant, operatorFilter));
     }
 
@@ -135,6 +138,18 @@ public class FilterCondition
             "!=*" => resolveGenericNegative(property, constant, "Equals", true),
             "!@=*" => resolveGenericNegative(property, constant, "Contains", true),
             "!_=*" => resolveGenericNegative(property, constant, "StartsWith", true),
+            _ => throw new ArgumentException("Invalid operator filter")
+        };
+    }
+
+    private static BinaryExpression EvaluateLengthText(Expression property, Expression constant, string operatorFilter)
+    {
+        return operatorFilter switch
+        {
+            ">" => Expression.GreaterThan(Expression.Property(property, "Length"), constant),
+            "<" => Expression.LessThan(Expression.Property(property, "Length"), constant),
+            ">=" => Expression.GreaterThanOrEqual(Expression.Property(property, "Length"), constant),
+            "<=" => Expression.LessThanOrEqual(Expression.Property(property, "Length"), constant),
             _ => throw new ArgumentException("Invalid operator filter")
         };
     }
@@ -453,7 +468,10 @@ public class FilterCondition
             typeValue = typeValueNotNull(typeValue);
             if (typeValue == typeof(string))
             {
-                constant = Expression.Constant(value);
+                if((!operatorFilter.StartsWith("<") && !operatorFilter.StartsWith(">")))
+                    constant = Expression.Constant(value);
+                else
+                    constant = Expression.Constant(Convert.ChangeType(value.Replace(".", ","), typeof(int)));
             }
             else if (IsNumericDecimalType(typeValue))
             {

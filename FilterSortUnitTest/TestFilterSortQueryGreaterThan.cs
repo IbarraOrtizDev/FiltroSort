@@ -53,15 +53,16 @@
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadString>Test18";
+            filter.Filter = "propiedadString>6";
 
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
+            var dataCount = _data.Where(x => x.propiedadString.Length > 6).ToList();
 
             //assert
-            Assert.AreEqual(_data.Count, data.Count);
+            Assert.AreEqual(dataCount.Count, data.Count);
         }
         [Test]
         public void ValidateFilterDataGreaterThanBoolean()
@@ -77,6 +78,23 @@
 
             //assert
             Assert.AreEqual(_data.Count, data.Count);
+        }
+
+        [Test]
+        public void ValidateFilterDataGreaterThanText()
+        {
+            //arrange
+            FilterSoftModel filter = new FilterSoftModel();
+            filter.Filter = "propiedadString>5";
+
+            //act
+            FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
+            var filt = filterSort.GetFilterExpression();
+            var data = _data.AsQueryable().Where(filt).ToList();
+            var dataCount = _data.Where(x => x.propiedadString.Length > 5).ToList();
+
+            //assert
+            Assert.AreEqual(dataCount.Count, data.Count);
         }
     }
 }
