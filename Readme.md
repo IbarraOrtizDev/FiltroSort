@@ -181,3 +181,14 @@ var filter = filterSoft.GetFilterExpression(filter);
 // Esto es similar al siguiente lambda: x=> x.propertyString !== null && x.propertyString >= 5
 lista.Where(filter).ToList();
 ```
+
+Consultar elementos de texto vacios
+```C#
+using FilterSoft;
+string filter = "propertyString==";
+var lista = new List<YourClass>();
+FilterSoft<YourClass> filterSoft = new FilterSoft<YourClass>();
+var filter = filterSoft.GetFilterExpression(filter);
+// Esto es similar al siguiente lambda: x=> x.propertyString !== null && x.propertyString == ""
+lista.Where(filter).ToList();
+```

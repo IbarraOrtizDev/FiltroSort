@@ -42,6 +42,10 @@ public class DeserializeFilterProperty
                 }
 
             }
+            else
+            {
+                Values.Add("");
+            }
         };
     }
 }
