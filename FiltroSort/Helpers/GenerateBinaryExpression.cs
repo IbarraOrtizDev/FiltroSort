@@ -23,12 +23,15 @@ public class GenerateBinaryExpression<T>
     /// <returns>
     /// Retorna una expresion binaria, de acuerdo a los segmentos de la cadena de filtro
     /// </returns>
-    public static BinaryExpression GetFilterExpressionGenerator(ParameterExpression parameter, string filterParam)
+    public static BinaryExpression GetFilterExpressionGenerator2(ParameterExpression parameter, string filterParam)
     {
         if (string.IsNullOrWhiteSpace(filterParam)) return null;
         bool isOr = false;
         if (filterParam.StartsWith("|"))
+        {
+            filterParam = filterParam.Substring(1);
             isOr = true;
+        }
 
         var propertiesList = GetSearchableProperties(typeof(T));
 
@@ -63,6 +66,103 @@ public class GenerateBinaryExpression<T>
 
         return binaryExpressions;
     }
+
+    /// <summary>
+    ///    Author:   Edwin Ibarra
+    ///    Create Date: 11/09/2024
+    ///    Deserializa cada segmento de la cadena de filtro y para cada segmento genera la expresion binaria, por medio de parentecis puede determinar si es and o or
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <param name="filtro"></param>
+    /// <returns>
+    /// Retorna una expresion binaria, de acuerdo a los segmentos de la cadena de filtro
+    /// </returns>
+    public static BinaryExpression GetFilterExpressionGenerator(ParameterExpression parameter, string filtro)
+    {
+        if (string.IsNullOrEmpty(filtro)) return null;
+
+        filtro = filtro.Trim().Replace(", (", ",(").Replace(") ,", "),");
+        bool isOr = filtro.StartsWith("|");
+        int last = 0;
+        var propertiesList = GetSearchableProperties(typeof(T));
+
+        BinaryExpression binaryExpressions = null;
+        if (isOr) filtro = filtro.Substring(1);
+
+        for (int i = 0; i <= filtro.Length; i++)
+        {
+            if (i < filtro.Length && filtro[i] == '(')
+            {
+                int start = i;
+                int end = FindClosingParenthesis(filtro, start);
+                string subQuery = filtro.Substring(start + 1, end - start - 1);
+                var expressionSubquery = GetFilterExpressionGenerator(parameter, subQuery);
+                binaryExpressions = binaryExpressions == null ? expressionSubquery : isOr ? Expression.OrElse(binaryExpressions, expressionSubquery) : Expression.AndAlso(binaryExpressions, expressionSubquery);
+                i = end;
+                last = i + 1;
+            }
+            else if (i == filtro.Length || filtro[i] == ',')
+            {
+                if (i > last)
+                {
+                    var filter = filtro.Substring(last, i - last);
+                    var conditionData = new DeserializeFilterProperty(filter, typeof(T));
+                    BinaryExpression condition = null;
+                    if (string.IsNullOrEmpty(conditionData.PropertyName) && string.IsNullOrEmpty(conditionData.Operator))
+                    {
+                        condition = FilterCondition.BinaryExpression<T>(propertiesList, parameter, filter);
+                    }
+                    else
+                    {
+                        if (!PropertyAndValueIsAvailable(filter, typeof(T), conditionData.Operator ?? "")) continue;
+
+                        var property = GetPropertyInfo(conditionData.PropertyName!, typeof(T));
+                        if (property == null) continue;
+
+                        condition = BinaryExpressionByProperty(conditionData.PropertyName, conditionData.Operator, parameter, conditionData.Values, property.PropertyType, typeof(T));
+                        if (condition == null) continue;
+                    };
+                    if (binaryExpressions == null)
+                        binaryExpressions = condition;
+                    else
+                        binaryExpressions = isOr ? Expression.OrElse(binaryExpressions, condition) : Expression.AndAlso(binaryExpressions, condition);
+                }
+                last = i + 1;
+            }
+        }
+
+        return binaryExpressions;
+    }
+
+    /// <summary>
+    ///    Author:   Edwin Ibarra
+    ///    Create Date: 11/09/2024
+    ///    Obtiene el indice de cierre de un parentesis
+    /// </summary>
+    /// <param name="str"></param>
+    /// <param name="openPos"></param>
+    /// <returns>
+    /// Retorna el indice de cierre de un parentesis
+    /// </returns>
+    public static int FindClosingParenthesis(string str, int openPos)
+    {
+        int closePos = openPos;
+        int counter = 1;
+        while (counter > 0)
+        {
+            closePos++;
+            if (str[closePos] == '(')
+            {
+                counter++;
+            }
+            else if (str[closePos] == ')')
+            {
+                counter--;
+            }
+        }
+        return closePos;
+    }
+
 
     /// <summary>
     ///     Author:   Edwin Ibarra
