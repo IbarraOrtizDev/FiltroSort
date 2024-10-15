@@ -112,6 +112,14 @@ public class GenerateBinaryExpression<T>
                     {
                         condition = FilterCondition.BinaryExpression<T>(propertiesList, parameter, filter);
                     }
+                    else if(conditionData.Operator == "@=" 
+                        && !string.IsNullOrEmpty(conditionData.PropertyName) 
+                        && typeof(T).GetProperty(conditionData.PropertyName) != null 
+                        && FilterCondition.typeValueNotNull(typeof(T).GetProperty(conditionData.PropertyName).PropertyType) == typeof(DateTime) 
+                        && conditionData.Values.Count == 1)
+                    {
+                        condition = FilterCondition.BinaryExpression<T>(new List<string>() { conditionData.PropertyName }, parameter, conditionData.Values.FirstOrDefault());
+                    }
                     else
                     {
                         if (!PropertyAndValueIsAvailable(filter, typeof(T), conditionData.Operator ?? "")) continue;

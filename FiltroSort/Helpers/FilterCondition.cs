@@ -209,16 +209,24 @@ public class FilterCondition
                 continue;
             }
             var propertyExp = Expression.Property(parameter, property);
-            var toStringMethod = typeof(object).GetMethod("ToString");
-            var toStringCall = Expression.Call(propertyExp, toStringMethod);
+            MethodCallExpression toStringCall;
+            if (FilterCondition.typeValueNotNull(typeProperty) == typeof(DateTime))
+            {
+                var hasValueProperty = Expression.Property(propertyExp, "HasValue");
+                var valueProperty = Expression.Property(propertyExp, "Value");
+                var toStringMethod = typeof(DateTime).GetMethod("ToString", new[] { typeof(string) });
+                toStringCall = Expression.Call(valueProperty, toStringMethod, Expression.Constant("MM-dd-yyyy hh:mm tt"));
+            }
+            else
+            {
+                var toStringMethod = typeof(object).GetMethod("ToString");
+                toStringCall = Expression.Call(propertyExp, toStringMethod);
+            }
+            var callExpression = Expression.Call(toStringCall, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
 
-            var toUpperMethod = typeof(string).GetMethod("ToUpper", Type.EmptyTypes);
-            var toUpperCall = Expression.Call(toStringCall, toUpperMethod);
-
-            var constantToUpper = Expression.Call(constant, toUpperMethod);
-
-            MethodCallExpression callExpression = Expression.Call(toStringCall, "Contains", null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));
             BinaryExpression expValidate = Expression.Equal(callExpression, Expression.Constant(true));
+
+
 
             if (binaryExpressionsReturn == null)
                 binaryExpressionsReturn = expValidate;
