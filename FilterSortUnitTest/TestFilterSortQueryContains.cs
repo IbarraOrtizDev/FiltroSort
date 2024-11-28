@@ -35,13 +35,15 @@
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "propiedadFecha@=2022-01-01";
+            filter.Filter = "propiedadFecha@=01-01-2022";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
+
+            var resp = _data.Where(x => x.propiedadFecha.Value.ToString("MM-dd-yyyy").Contains("01-01-2022")).ToList();
             //assert
-            Assert.AreEqual(_data.Count, data.Count);
+            Assert.AreEqual(resp.Count, data.Count);
         }
         [Test]
         public void ValidateFilterDataContainsNumber()
