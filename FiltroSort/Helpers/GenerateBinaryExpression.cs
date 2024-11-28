@@ -182,7 +182,7 @@ public class GenerateBinaryExpression<T>
 
         foreach (var value in values)
         {
-            var evaluation = FilterCondition.BinaryExpression(propertyName, operatorFilter, parameter, value, typeValue, typeValuePrincipal);
+            var evaluation = FilterCondition.BinaryExpression(typeValuePrincipal, propertyName, null,operatorFilter, value, parameter, null,null );
             if(binaryExpressions == null)
                 binaryExpressions = evaluation;
             else

@@ -12,10 +12,88 @@ namespace FilterSort.Helpers;
 /// </summary>
 public class FilterCondition
 {
+
+    /// <summary>
+    /// Recibe la expresion de condicion y la convierte en una expresion lambda, la cual se utiliza para filtrar los datos
+    /// </summary>
+    /// <param name="typeValuePrincipal"></param>
+    /// <param name="propertyNamePath"></param>
+    /// <param name="propertyNamePathEvaluado"></param>
+    /// <param name="operatorFilter"></param>
+    /// <param name="value"></param>
+    /// <param name="parameter"></param>
+    /// <param name="property"></param>
+    /// <param name="acc"></param>
+    /// <returns></returns>
+    public static BinaryExpression BinaryExpression(Type typeValuePrincipal, string propertyNamePath, string? propertyNamePathEvaluado, string operatorFilter, string value, ParameterExpression parameter,  MemberExpression? property, BinaryExpression? acc)
+    {
+        if (!propertyNamePath.Contains("."))
+        {
+            var respB = BinaryExpressionFinally(propertyNamePath, operatorFilter, parameter, value, typeValuePrincipal.Name.StartsWith("List") ? typeValuePrincipal.GetGenericArguments()[0].GetProperty(propertyNamePath).PropertyType : typeValuePrincipal.GetProperty(propertyNamePath).PropertyType, typeValuePrincipal, property);
+            if (acc == null)
+                return respB;
+            return Expression.AndAlso(acc, respB);
+        }
+        var properties = propertyNamePath.Split(".");
+
+        string propertyEvaluate = properties[0]; // propertyNamePathEvaluado == null ? properties[0] : (propertyNamePathEvaluado + "." + properties[0]);
+        foreach (string element in propertyEvaluate.Split("."))
+        {
+            if (property == null)
+                property = Expression.Property(parameter, element);
+            else
+                property = Expression.Property(property, element);
+        }
+
+        var propertyNotNull = Expression.NotEqual(property, Expression.Constant(null));
+        var propertyType = typeValuePrincipal.GetProperty(properties[0]).PropertyType;
+        acc = acc == null ? propertyNotNull : Expression.AndAlso(acc, propertyNotNull);
+        //Evaluar si la propiedad es una lista
+        if (typeValuePrincipal.GetProperty(properties[0]).PropertyType.Name.Contains("List"))
+        {
+            var respAny = BinaryExpressionAnyInList(typeValuePrincipal, propertyNamePath, operatorFilter, value, property);
+            if (acc == null)
+                return respAny;
+            return Expression.AndAlso(acc, respAny);
+        }else
+            return BinaryExpression(propertyType, propertyNamePath.Replace(properties[0] + ".", ""), propertyEvaluate, operatorFilter, value, parameter, property, acc);
+    }
+
+    /// <summary>
+    /// Se crea para evaluar propiedades de tipo lista de objetos cuando se debe aplicar any a la consulta
+    /// </summary>
+    /// <param name="typeValuePrincipal"></param>
+    /// <param name="propertyNamePath"></param>
+    /// <param name="operatorFilter"></param>
+    /// <param name="value"></param>
+    /// <param name="property"></param>
+    /// <returns></returns>
+    public static BinaryExpression BinaryExpressionAnyInList(Type typeValuePrincipal, string propertyNamePath, string operatorFilter, string value, MemberExpression? property)
+    {
+        var propertyNameLeft = propertyNamePath.Split(".")[0];
+        propertyNamePath = propertyNamePath.Replace(propertyNameLeft + ".", "");
+
+        var parameterY = Expression.Parameter(typeValuePrincipal.GetProperty(propertyNameLeft).PropertyType.GenericTypeArguments[0], "y");
+
+        var resp = BinaryExpression(typeValuePrincipal.GetProperty(propertyNameLeft).PropertyType, propertyNamePath, null, operatorFilter, value, parameterY, null, null);
+
+        var lambda = Expression.Lambda(resp, parameterY);
+
+        var anyCall = Expression.Call(
+            typeof(Enumerable),
+            "Any",
+            new Type[] { typeValuePrincipal.GetProperty(propertyNameLeft).PropertyType.GenericTypeArguments[0] },
+            property,
+            lambda
+        );
+
+        return Expression.Equal(anyCall, Expression.Constant(true));
+    }
+
     /// <summary>
     ///    Author:   Edwin Ibarra
     ///    Create Date: 14/03/2024
-    ///    BinaryExpression, este metodo se encarga de generar la expresion binaria, la cual se utiliza para generar la expresion de condicion, cuando el parametro de busqueda values no es vacio, se utiliza el operador IN o NOT IN
+    ///    BinaryExpressionFinally, este metodo se encarga de generar la expresion binaria, la cual se utiliza para generar la expresion de condicion, cuando el parametro de busqueda values no es vacio, se utiliza el operador IN o NOT IN
     /// </summary>
     /// <param name="propertyName"></param>
     /// <param name="operatorFilter"></param>
@@ -28,9 +106,9 @@ public class FilterCondition
     /// Retorna la expresion binaria
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
-    public static BinaryExpression BinaryExpression(string propertyName, string operatorFilter, ParameterExpression parameter, string value, Type typeValue, Type typeValuePrincipal, MemberExpression property = null)
+    public static BinaryExpression BinaryExpressionFinally(string propertyName, string operatorFilter, ParameterExpression parameter, string value, Type typeValue, Type typeValuePrincipal, MemberExpression property = null)
     {
-        if(property == null && !(propertyName.Contains(".") && typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.Name.Contains("List")) )
+        if(!(propertyName.Contains(".") && typeValuePrincipal.GetProperty(propertyName.Split(".")[0]).PropertyType.Name.Contains("List")) )
         {
             foreach (string element in propertyName.Split("."))
             {
@@ -100,7 +178,7 @@ public class FilterCondition
         var parameterY = Expression.Parameter(typeProperty, "y");
         MemberExpression propertyY = Expression.Property(parameterY, propertyNameLeft);
 
-        var subQuery= BinaryExpression(propertyName, operatorFilter, parameterY, value, typeProperty.GetProperty(propertyNameLeft).PropertyType, typeProperty, propertyY);
+        var subQuery= BinaryExpressionFinally(propertyName, operatorFilter, parameterY, value, typeProperty.GetProperty(propertyNameLeft).PropertyType, typeProperty, propertyY);
         var lambda = Expression.Lambda(subQuery, parameterY);
         return lambda;
     }

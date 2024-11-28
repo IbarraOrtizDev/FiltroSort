@@ -103,12 +103,57 @@ namespace FilterSortUnitTest
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
+            filter.Filter = "(|propiedadObjeto.propiedadListaString==2,propiedadObjeto.propiedadListaString==null)";
+            //act
+            FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
+            var filt = filterSort.GetFilterExpression();
+            var data = _data.AsQueryable().Where(filt).ToList();
+            var dataCount = _data.Where(x => x.propiedadObjeto?.propiedadListaString?.Count() == 2 || (x.propiedadObjeto != null && x.propiedadObjeto.propiedadListaString == null)).Count();
+            //assert
+            Assert.AreEqual(dataCount, data.Count);
+        }
+
+        [Test]
+        public void ValidateFilterDataByObjectCountEqualOrListStringTwo()
+        {
+            //arrange
+            FilterSoftModel filter = new FilterSoftModel();
             filter.Filter = "propiedadObjeto.propiedadListaString==2|null";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
             var data = _data.AsQueryable().Where(filt).ToList();
             var dataCount = _data.Where(x => x.propiedadObjeto?.propiedadListaString?.Count() == 2 || (x.propiedadObjeto != null && x.propiedadObjeto.propiedadListaString == null)).Count();
+            //assert
+            Assert.AreEqual(dataCount, data.Count);
+        }
+
+        [Test]
+        public void ValidateFilterDataByObjectSearchInListObjects()
+        {
+            //arrange
+            FilterSoftModel filter = new FilterSoftModel();
+            filter.Filter = "propiedadObjeto.propiedadListaObjetos.propiedadString==Texto1-0";
+            //act
+            FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
+            var filt = filterSort.GetFilterExpression();
+            var data = _data.AsQueryable().Where(filt).ToList();
+            var dataCount = _data.Where(x => x.propiedadObjeto != null && x.propiedadObjeto.propiedadListaObjetos != null && x.propiedadObjeto.propiedadListaObjetos.Any(y=> y.propiedadString == "Texto1-0")).Count();
+            //assert
+            Assert.AreEqual(dataCount,data.Count);
+        }
+
+        [Test]
+        public void ValidateFilterDataByObjectSearchInListObjectsCount()
+        {
+            //arrange
+            FilterSoftModel filter = new FilterSoftModel();
+            filter.Filter = "propiedadObjeto.propiedadListaObjetos.propiedadListaString==2";
+            //act
+            FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
+            var filt = filterSort.GetFilterExpression();
+            var data = _data.AsQueryable().Where(filt).ToList();
+            var dataCount = _data.Where(x => x.propiedadObjeto != null && x.propiedadObjeto.propiedadListaObjetos != null && x.propiedadObjeto.propiedadListaObjetos.Any(y => y.propiedadListaString != null && y.propiedadListaString.Count == 2)).Count();
             //assert
             Assert.AreEqual(dataCount, data.Count);
         }
