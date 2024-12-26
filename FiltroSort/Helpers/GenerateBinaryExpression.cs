@@ -370,6 +370,9 @@ public class GenerateBinaryExpression<T>
             return GetSearchableProperties(typeObject.GetGenericArguments()[0]);
         }
         return typeObject.GetProperties()
-            .Where(e => e.GetCustomAttribute<Searchable>(true) != null).Select(x => x.Name).ToList();
+            .Where(e =>
+                //e.CustomAttributes.ToList()[0].AttributeType.Name
+                e.CustomAttributes.ToList().Any(x=> x.AttributeType.Name == "Searchable")
+            ).Select(x => x.Name).ToList();
     }
 }
