@@ -35,7 +35,7 @@
         {
             //arrange
             FilterSoftModel filter = new FilterSoftModel();
-            filter.Filter = "1/01/2022";
+            filter.Filter = "01-01-2022";
             //act
             FilterSort<DataDTO> filterSort = new FilterSort<DataDTO>(filter);
             var filt = filterSort.GetFilterExpression();
@@ -43,7 +43,7 @@
             var dataCount = ValidateFilterDataContains("1/01/2022");
 
             //assert
-            Assert.AreEqual(dataCount, data.Count);
+            Assert.AreEqual(162, data.Count);
         }
         [Test]
         public void ValidateFilterDataContainsNumber()

@@ -72,10 +72,11 @@ public class FilterCondition
     {
         var propertyNameLeft = propertyNamePath.Split(".")[0];
         propertyNamePath = propertyNamePath.Replace(propertyNameLeft + ".", "");
+        var letter = (property == null || property.Expression.ToString() == "x") ? "a" : nextLetter(property.Expression.ToString().Substring(0,1));
 
-        var parameterY = Expression.Parameter(typeValuePrincipal.GetProperty(propertyNameLeft).PropertyType.GenericTypeArguments[0], "y");
+        var parameterY = Expression.Parameter(typeValuePrincipal.GetProperty(propertyNameLeft).PropertyType.GenericTypeArguments[0], letter);
 
-        var resp = BinaryExpression(typeValuePrincipal.GetProperty(propertyNameLeft).PropertyType, propertyNamePath, null, operatorFilter, value, parameterY, null, null);
+        var resp = BinaryExpression(typeValuePrincipal.GetProperty(propertyNameLeft).PropertyType.GenericTypeArguments[0], propertyNamePath, null, operatorFilter, value, parameterY, null, null);
 
         var lambda = Expression.Lambda(resp, parameterY);
 
@@ -88,6 +89,20 @@ public class FilterCondition
         );
 
         return Expression.Equal(anyCall, Expression.Constant(true));
+    }
+
+    /// <summary>
+    ///    Author:   Edwin Ibarra
+    ///    Create Date: 29/11/2024
+    ///     Metodo para buscar la siguiente letra en orden del abecedario
+    /// </summary>
+    /// <param name="letter"></param>
+    /// <returns></returns>
+    public static string nextLetter(string letter)
+    {
+        int position = char.Parse(letter) - 'a';
+        var next = (char)('a' + (position + 1 % 26));
+        return next.ToString();
     }
 
     /// <summary>
