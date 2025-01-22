@@ -38,7 +38,7 @@ Basicamente FilterSoft recibe como parametro un objeto con la siguiente estructu
 
 ## Nota :
 
-filter=Alex
+filter=FiltroSort
 
 1. Si el operador no es valido y solo se tiene una propiedad filtrable en el queryparam, la sección del filtro sera tomada como un valor a buscar en todas las propiedades [Searchable], de lo contrario sera ignorada.
 2. Si el tipo de dato del filtro no corresponde al tipo de dato de la propiedad, este sera ignorado.
