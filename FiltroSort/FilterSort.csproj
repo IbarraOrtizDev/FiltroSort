@@ -4,6 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	  <PackageId>IbarraOrtizDev.FilterSort</PackageId>
+	<Version>1.0.1</Version>
+	<Authors>IbarraOrtizDev</Authors>
+	<Description>Filter and Sort return binary expresion</Description>
+	<Product>FilterSort</Product>
   </PropertyGroup>
 
 </Project>
