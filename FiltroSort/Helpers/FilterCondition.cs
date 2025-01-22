@@ -364,9 +364,10 @@ public class FilterCondition
             /*callExpression = Expression.Call(property, method, null, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase));*/
             var toStringMethod = typeof(object).GetMethod("ToString");
             var toStringCall = Expression.Call(propertyExp, toStringMethod);
+            var continueMethod = propertyExp.Type.Name == "String" ? propertyExp : toStringCall;
 
             var toUpperMethod = typeof(string).GetMethod("ToUpper", Type.EmptyTypes);
-            var toUpperCall = Expression.Call(toStringCall, toUpperMethod);
+            var toUpperCall = Expression.Call(continueMethod, toUpperMethod);
 
             var constantToUpper = Expression.Call(constant, toUpperMethod);
             if(method == "Equals")
