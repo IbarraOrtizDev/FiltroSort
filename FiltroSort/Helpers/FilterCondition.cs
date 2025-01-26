@@ -454,9 +454,10 @@ public class FilterCondition
         MethodCallExpression callExpression;
         var toStringMethod = typeof(object).GetMethod("ToString");
         var toStringCall = Expression.Call(propertyExp, toStringMethod);
+        var continueMethod = propertyExp.Type.Name == "String" ? propertyExp : toStringCall;
 
         var toUpperMethod = typeof(string).GetMethod("ToUpper", Type.EmptyTypes);
-        var toUpperCall = Expression.Call(toStringCall, toUpperMethod);
+        var toUpperCall = Expression.Call(continueMethod, toUpperMethod);
 
         // Convert the constant to upper case
         var constantToUpper = Expression.Call(constant, toUpperMethod);
@@ -485,9 +486,10 @@ public class FilterCondition
         {
             var toStringMethod = typeof(object).GetMethod("ToString");
             var toStringCall = Expression.Call(propertyExp, toStringMethod);
+            var continueMethod = propertyExp.Type.Name == "String" ? propertyExp : toStringCall;
 
             var toUpperMethod = typeof(string).GetMethod("ToUpper", Type.EmptyTypes);
-            var toUpperCall = Expression.Call(toStringCall, toUpperMethod);
+            var toUpperCall = Expression.Call(continueMethod, toUpperMethod);
 
             var constantToUpper = Expression.Call(constant, toUpperMethod);
             if (method == "Equals")
