@@ -577,7 +577,7 @@ public class FilterCondition
             }
             else if (IsNumericDecimalType(typeValue))
             {
-                constant = Expression.Constant(Convert.ChangeType(value.Replace(".", ","), typeValue));
+                constant = Expression.Constant(Convert.ChangeType(value, typeValue));
             }
             else if (typeValue.Name.Contains("List"))
             {

@@ -209,12 +209,15 @@ public class GenerateBinaryExpression<T>
     private static bool PropertyAndValueIsAvailable(string filter, Type typeValue, string operatorFilter = "")
     {
         var propertiesList = GetSearchableProperties(typeValue);
+        var filterInitial = filter.Split(operatorFilter)[0] + operatorFilter;
         if (!string.IsNullOrEmpty(operatorFilter) && filter.Split(operatorFilter)[0].Contains("."))
         {
             bool found = false;
+            var acomulated = "";
             filter.Split(operatorFilter)[0].Split('.').ToList().ForEach(x =>
             {
-                if (propertiesList.Contains(x) && !filter.Contains(x + operatorFilter))
+                acomulated = acomulated + (acomulated == "" ? "" : ".") + x;
+                if (propertiesList.Contains(x) && filterInitial != (acomulated + operatorFilter))
                 {
                     propertiesList = GetSearchableProperties(typeValue.GetProperty(x).PropertyType);
                     if (typeValue.GetProperty(x).PropertyType.Name.Contains("List") && !FilterCondition.IsPrimitiveExtenssionProperty(typeValue.GetProperty(x).PropertyType.GetGenericArguments()[0]))
