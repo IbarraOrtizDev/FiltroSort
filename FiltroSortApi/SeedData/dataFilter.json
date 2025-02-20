@@ -1,5 +1,6 @@
 [
   {
+    "type": 0,
     "propiedadString": "Texto0",
     "propiedadBooleana": true,
     "propiedadEntera": 0,
@@ -46,6 +47,7 @@
     ]
   },
   {
+    "type": 0,
     "propiedadString": "Texto1",
     "propiedadBooleana": false,
     "propiedadEntera": 1,
@@ -55,7 +57,7 @@
       2,
       3
     ],
-    "propiedadObjeto" : {
+    "propiedadObjeto": {
       "propiedadString": "Texto1-1",
       "propiedadBooleana": false,
       "propiedadEntera": 2,
@@ -64,12 +66,13 @@
     }
   },
   {
+    "type": 1,
     "propiedadString": "Texto2",
     "propiedadBooleana": true,
     "propiedadEntera": 2,
     "propiedadFecha": "2022-01-03T00:00:00",
     "propiedadListaString": [ "Texto1", "Texto4", "Texto5" ],
-    "propiedadObjeto" : {
+    "propiedadObjeto": {
       "propiedadString": "Texto2-1",
       "propiedadBooleana": true,
       "propiedadEntera": 3,
@@ -78,12 +81,13 @@
     }
   },
   {
+    "type": 1,
     "propiedadString": "Texto3",
     "propiedadBooleana": false,
     "propiedadEntera": 3,
     "propiedadFecha": "2022-01-04T00:00:00",
     "propiedadListaEntera": [ 1, 4, 5 ],
-    "propiedadObjeto" : {
+    "propiedadObjeto": {
       "propiedadString": "Texto3-1",
       "propiedadBooleana": false,
       "propiedadEntera": 1,
@@ -92,6 +96,7 @@
     }
   },
   {
+    "type": 2,
     "propiedadString": "Texto4",
     "propiedadBooleana": true,
     "propiedadEntera": 4,
@@ -99,6 +104,7 @@
     "propiedadListaString": [ "Texto2", "Texto3", "Texto6" ]
   },
   {
+    "type": 2,
     "propiedadString": "Texto5",
     "propiedadBooleana": false,
     "propiedadEntera": 5,
@@ -106,6 +112,7 @@
     "propiedadListaEntera": [ 2, 3, 6 ]
   },
   {
+    "type": 2,
     "propiedadString": "Texto6",
     "propiedadBooleana": true,
     "propiedadEntera": 6,

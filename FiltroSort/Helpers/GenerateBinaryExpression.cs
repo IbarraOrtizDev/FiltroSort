@@ -306,7 +306,7 @@ public class GenerateBinaryExpression<T>
                 _ => false
             };
         }
-        else if (type == typeof(int) || type == typeof(double) || type == typeof(decimal))
+        else if (type == typeof(int) || type == typeof(double) || type == typeof(decimal) || (type?.BaseType?.Name??"") == "Enum")
         {
             return operatorFilter switch
             {

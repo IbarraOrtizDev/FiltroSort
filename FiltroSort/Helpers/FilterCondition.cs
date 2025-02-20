@@ -581,6 +581,10 @@ public class FilterCondition
             {
                 constant = Expression.Constant(Convert.ChangeType(value, typeValue));
             }
+            else if((typeValue?.BaseType?.Name??"") == "Enum")
+            {
+                constant = Expression.Constant(Enum.Parse(typeValue, value), typeValue);
+            }
             else if (typeValue.Name.Contains("List"))
             {
                 if (operatorFilter == "@=" || operatorFilter == "!@=")
